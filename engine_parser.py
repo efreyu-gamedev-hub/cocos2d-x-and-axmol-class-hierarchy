@@ -95,15 +95,44 @@ def try_install_system_libclang() -> None:
             except Exception:
                 pass
 
+def _find_libclang() -> Optional[str]:
+    """Locate the native libclang shared library."""
+    sysname = platform.system().lower()
+    if sysname == "windows":
+        pattern, glob_pat = "libclang.dll", "libclang.dll"
+    elif sysname == "darwin":
+        pattern, glob_pat = "libclang.dylib", "libclang*.dylib"
+    else:
+        pattern, glob_pat = "libclang.so", "libclang.so*"
+
+    # 1) Try homebrew llvm on macOS (usually matches the latest clang bindings)
+    if sysname == "darwin":
+        for brew_prefix in ("/opt/homebrew/opt/llvm/lib", "/usr/local/opt/llvm/lib"):
+            brew_path = Path(brew_prefix) / pattern
+            if brew_path.exists():
+                return str(brew_path)
+
+    # 2) Look next to the clang python package (pip 'libclang' puts it in clang/native/)
+    try:
+        import clang as _clang_pkg
+        pkg_dir = Path(_clang_pkg.__file__).parent
+        candidates = list(pkg_dir.rglob(glob_pat))
+        if candidates:
+            candidates.sort(key=lambda p: len(p.name))
+            return str(candidates[0])
+    except Exception:
+        pass
+
+    return None
+
+
 def load_clang():
     """
     Import clang.cindex and ensure it can locate libclang shared library.
     """
     try:
         import clang.cindex  # type: ignore
-        return clang.cindex
-    except Exception:
-        # Try to install python packages and system libclang (best-effort), then retry
+    except ImportError:
         try:
             ensure_pip_packages()
         except Exception:
@@ -112,28 +141,12 @@ def load_clang():
             try_install_system_libclang()
         except Exception:
             pass
+        import clang.cindex  # type: ignore
 
-    import clang.cindex  # type: ignore
-
-    # If libclang isn't found, try configuring from libclang pip package
-    try:
-        from libclang import get_library_path  # type: ignore
-        libdir = Path(get_library_path())
-        # Pick a plausible filename
-        candidates = []
-        if platform.system().lower() == "windows":
-            candidates = list(libdir.glob("libclang.dll"))
-        elif platform.system().lower() == "darwin":
-            candidates = list(libdir.glob("libclang*.dylib"))
-        else:
-            candidates = list(libdir.glob("libclang.so*"))
-
-        if candidates:
-            # Choose the shortest name if multiple (often libclang.so or libclang.dylib)
-            candidates.sort(key=lambda p: len(p.name))
-            clang.cindex.Config.set_library_file(str(candidates[0]))
-    except Exception:
-        pass
+    # Configure library path before any clang API calls
+    lib_path = _find_libclang()
+    if lib_path:
+        clang.cindex.Config.set_library_file(lib_path)
 
     return clang.cindex
 
@@ -245,8 +258,13 @@ def get_cursor_file(cursor) -> Optional[str]:
 def is_public_method(cursor, clang) -> bool:
     if cursor.kind != clang.CursorKind.CXX_METHOD:
         return False
-    if cursor.is_implicit():
-        return False
+    try:
+        if cursor.is_implicit():
+            return False
+    except AttributeError:
+        # Fallback: skip compiler-generated methods by checking location
+        if not cursor.location or not cursor.location.file:
+            return False
     try:
         if cursor.access_specifier != clang.AccessSpecifier.PUBLIC:
             return False
@@ -265,6 +283,30 @@ def build_display_method_name(cursor) -> str:
 # ----------------------------
 # Main AST extraction
 # ----------------------------
+
+def _extra_clang_args() -> List[str]:
+    """Detect -isysroot and clang builtin include paths for the current platform."""
+    extra: List[str] = []
+    if platform.system().lower() == "darwin":
+        try:
+            sdk = subprocess.check_output(["xcrun", "--show-sdk-path"], text=True).strip()
+            if sdk:
+                extra += ["-isysroot", sdk]
+        except Exception:
+            pass
+        # Clang builtin headers (stdarg.h, etc.)
+        for prefix in ("/opt/homebrew/opt/llvm/lib/clang", "/usr/local/opt/llvm/lib/clang"):
+            p = Path(prefix)
+            if p.is_dir():
+                versions = sorted(p.iterdir(), reverse=True)
+                for v in versions:
+                    inc = v / "include"
+                    if inc.is_dir():
+                        extra += ["-isystem", str(inc)]
+                        break
+                break
+    return extra
+
 
 def load_compile_commands(cc_path: Path) -> List[dict]:
     with cc_path.open("r", encoding="utf-8") as f:
@@ -285,20 +327,23 @@ def make_args(entry: dict) -> Tuple[str, List[str], str]:
         args = cmd.split()[1:]
     return file_, args, directory
 
-def parse_translation_units(clang, cc_entries: List[dict]) -> Tuple[
+def parse_translation_units(clang, cc_entries: List[dict], project_dir: Path) -> Tuple[
     Dict[str, dict],  # class_name -> info
     Dict[str, Set[str]],  # base_name -> set(derived_names)
     Set[str],  # all class names
 ]:
     index = clang.Index.create()
+    extra_args = _extra_clang_args()
+    project_root = normalize_path(str(project_dir)) + "/"
 
     classes: Dict[str, dict] = {}
     derived_map: Dict[str, Set[str]] = {}
     all_names: Set[str] = set()
 
     parsed_files: Set[str] = set()
+    total = len(cc_entries)
 
-    for entry in cc_entries:
+    for idx, entry in enumerate(cc_entries):
         file_, args, directory = make_args(entry)
         if not file_:
             continue
@@ -312,20 +357,22 @@ def parse_translation_units(clang, cc_entries: List[dict]) -> Tuple[
         # libclang is picky: ensure working dir matches compile database directory
         workdir = directory if directory else None
 
-        # Filter args that commonly break parsing when paths differ
+        # Filter args that commonly break parsing
         filtered_args = []
         skip_next = False
         for a in args:
             if skip_next:
                 skip_next = False
                 continue
-            # Drop output flags
-            if a in ("-o",):
+            # Drop flags that take a next argument and break libclang
+            if a in ("-o", "-c", "-arch"):
                 skip_next = True
                 continue
             if a.startswith("-o"):
                 continue
             filtered_args.append(a)
+
+        filtered_args = extra_args + filtered_args
 
         try:
             tu = index.parse(
@@ -346,7 +393,19 @@ def parse_translation_units(clang, cc_entries: List[dict]) -> Tuple[
             except Exception:
                 continue
 
+        print(f"\r  [{idx+1}/{total}] {os.path.basename(file_)}", end="", flush=True)
+
+        # Determine project root to skip system/external headers during traversal
+        project_prefix = normalize_path(os.path.dirname(key)).rsplit("/external/", 1)[0]
+
         def visit(cursor):
+            # Skip cursors from files outside the project
+            loc = cursor.location
+            if loc and loc.file:
+                fpath = normalize_path(str(loc.file))
+                if not fpath.startswith(project_prefix):
+                    return
+
             # Collect class/struct definitions
             if cursor.kind in (clang.CursorKind.CLASS_DECL, clang.CursorKind.STRUCT_DECL):
                 try:
@@ -376,6 +435,8 @@ def parse_translation_units(clang, cc_entries: List[dict]) -> Tuple[
                 # Header path
                 fpath = get_cursor_file(cursor)
                 header = normalize_path(fpath) if fpath else ""
+                if header.startswith(project_root):
+                    header = header[len(project_root):]
 
                 # Description
                 desc = cursor_comment_text(cursor)
@@ -429,6 +490,7 @@ def parse_translation_units(clang, cc_entries: List[dict]) -> Tuple[
 
         visit(tu.cursor)
 
+    print(f"\nParsed {len(parsed_files)} files, found {len(classes)} classes.")
     return classes, derived_map, all_names
 
 def build_tree(classes: Dict[str, dict], derived_map: Dict[str, Set[str]], root_name: str) -> dict:
@@ -486,10 +548,10 @@ def main() -> int:
 
     # 2) parse and build dependency tree from Ref
     cc_entries = load_compile_commands(cc_path)
-    classes, derived_map, _all = parse_translation_units(clang, cc_entries)
+    classes, derived_map, _all = parse_translation_units(clang, cc_entries, project_dir)
 
     # If Ref isn't found, still emit a minimal root
-    root = build_tree(classes, derived_map, "Ref")
+    root = build_tree(classes, derived_map, "Object")
 
     # 3) write output
     out_json.parent.mkdir(parents=True, exist_ok=True)
