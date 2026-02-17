@@ -7905,12 +7905,20 @@
             "description": "Create an auto released DepthStencilState object.\n@param descriptor Specifies depth and stencil description.\n@return An auto release DepthStencilState object."
           },
           {
+            "name": "getDPI()",
+            "description": "Gets the DPI of device\n @return The DPI of device."
+          },
+          {
             "name": "getDeviceInfo()",
             "description": "Get a DeviceInfo object.\n@return A DeviceInfo object."
           },
           {
             "name": "getInstance()",
             "description": "Returns a shared instance of the device."
+          },
+          {
+            "name": "getTextureDataForText(const char *, const FontDefinition &, TextAlign, int &, int &, bool &)",
+            "description": "Gets texture data for text."
           },
           {
             "name": "newBuffer(size_t, BufferType, BufferUsage)",
@@ -7933,8 +7941,24 @@
             "description": "New a TextureBackend object, not auto released.\n@param descriptor Specifies texture description.\n@return A TextureBackend object."
           },
           {
+            "name": "setAccelerometerEnabled(bool)",
+            "description": "To enable or disable accelerometer."
+          },
+          {
+            "name": "setAccelerometerInterval(float)",
+            "description": "Sets the interval of accelerometer."
+          },
+          {
             "name": "setFrameBufferOnly(bool)",
             "description": "This property controls whether or not the drawables'\nmetal textures may only be used for framebuffer attachments (YES) or\nwhether they may also be used for texture sampling and pixel\nread/write operations (NO).\n@param frameBufferOnly A value of YES allows CAMetalLayer to allocate the MTLTexture objects in ways that are optimized for display purposes that makes them unsuitable for sampling. The recommended value for most applications is YES.\n@note This interface is specificaly designed for metal."
+          },
+          {
+            "name": "setKeepScreenOn(bool)",
+            "description": "Controls whether the screen should remain on.\n\n@param keepScreenOn One flag indicating that the screen should remain on."
+          },
+          {
+            "name": "vibrate(float)",
+            "description": "Vibrate for the specified amount of time.\nIf vibrate is not supported, then invoking this method has no effect.\nSome platforms limit to a maximum duration of 5 seconds.\nDuration is ignored on iOS due to API limitations.\n@param duration The duration in seconds."
           }
         ],
         "children": [
@@ -10320,7 +10344,140 @@
             "description": "When the window is closed, it will return false if the platforms is Ios or Android.\nIf the platforms is windows or Mac,it will return true.\n\n@return In ios and android it will return false,if in windows or Mac it will return true."
           }
         ],
-        "children": []
+        "children": [
+          {
+            "name": "GLViewImpl",
+            "description": "",
+            "header": "cocos/platform/desktop/CCGLViewImpl-desktop.h",
+            "methods": [
+              {
+                "name": "create(const std::string &)",
+                "description": ""
+              },
+              {
+                "name": "create(const std::string &, bool)",
+                "description": ""
+              },
+              {
+                "name": "createWithFullScreen(const std::string &)",
+                "description": ""
+              },
+              {
+                "name": "createWithFullScreen(const std::string &, const GLFWvidmode &, GLFWmonitor *)",
+                "description": ""
+              },
+              {
+                "name": "createWithRect(const std::string &, Rect, float, bool)",
+                "description": ""
+              },
+              {
+                "name": "enableRetina(bool)",
+                "description": "Retina support is disabled by default\n @note This method is only available on Mac."
+              },
+              {
+                "name": "end()",
+                "description": ""
+              },
+              {
+                "name": "getCocoaWindow()",
+                "description": ""
+              },
+              {
+                "name": "getFrameZoomFactor()",
+                "description": ""
+              },
+              {
+                "name": "getMonitorCount()",
+                "description": ""
+              },
+              {
+                "name": "getMonitorSize()",
+                "description": ""
+              },
+              {
+                "name": "getNSGLContext()",
+                "description": ""
+              },
+              {
+                "name": "getRetinaFactor()",
+                "description": "Get retina factor"
+              },
+              {
+                "name": "getScissorRect()",
+                "description": ""
+              },
+              {
+                "name": "getWindow()",
+                "description": ""
+              },
+              {
+                "name": "isFullscreen()",
+                "description": ""
+              },
+              {
+                "name": "isOpenGLReady()",
+                "description": ""
+              },
+              {
+                "name": "isRetinaEnabled()",
+                "description": "Check whether retina display is enabled."
+              },
+              {
+                "name": "pollEvents()",
+                "description": ""
+              },
+              {
+                "name": "setCursorVisible(bool)",
+                "description": "Hide or Show the mouse cursor if there is one."
+              },
+              {
+                "name": "setFrameSize(float, float)",
+                "description": ""
+              },
+              {
+                "name": "setFrameZoomFactor(float)",
+                "description": ""
+              },
+              {
+                "name": "setFullscreen()",
+                "description": ""
+              },
+              {
+                "name": "setFullscreen(const GLFWvidmode &, GLFWmonitor *)",
+                "description": ""
+              },
+              {
+                "name": "setFullscreen(int)",
+                "description": ""
+              },
+              {
+                "name": "setIMEKeyboardState(bool)",
+                "description": ""
+              },
+              {
+                "name": "setScissorInPoints(float, float, float, float)",
+                "description": ""
+              },
+              {
+                "name": "setViewPortInPoints(float, float, float, float)",
+                "description": ""
+              },
+              {
+                "name": "setWindowed(int, int)",
+                "description": ""
+              },
+              {
+                "name": "swapBuffers()",
+                "description": ""
+              },
+              {
+                "name": "windowShouldClose()",
+                "description": ""
+              }
+            ],
+            "children": []
+          }
+        ]
       },
       {
         "name": "GUIReader",
@@ -15676,10 +15833,6 @@
                         "description": ""
                       },
                       {
-                        "name": "getCurrentTitle()",
-                        "description": ""
-                      },
-                      {
                         "name": "getCurrentTitleColor()",
                         "description": "The current color used to display the title."
                       },
@@ -18664,10 +18817,6 @@
               {
                 "name": "getParallaxArray()",
                 "description": "Returns the array of layers of the Parallax node.\n\n@return An array of layers for the Parallax node."
-              },
-              {
-                "name": "getParallaxArray()",
-                "description": ""
               },
               {
                 "name": "removeAllChildrenWithCleanup(bool)",
@@ -26556,7 +26705,8 @@
             ],
             "children": []
           }
-        ]
+        ],
+        "opened": true
       },
       {
         "name": "Node3DReader",
@@ -37020,222 +37170,6 @@
     ]
   },
   {
-    "name": "Renderer",
-    "description": "",
-    "header": "cocos/renderer/CCRenderer.h",
-    "methods": [
-      {
-        "name": "addCommand(RenderCommand *)",
-        "description": "Adds a `RenderComamnd` into the renderer"
-      },
-      {
-        "name": "addCommand(RenderCommand *, int)",
-        "description": "Adds a `RenderComamnd` into the renderer specifying a particular render queue ID"
-      },
-      {
-        "name": "addDrawnBatches(ssize_t)",
-        "description": ""
-      },
-      {
-        "name": "addDrawnVertices(ssize_t)",
-        "description": ""
-      },
-      {
-        "name": "checkVisibility(const Mat4 &, const Size &)",
-        "description": "returns whether or not a rectangle is visible or not"
-      },
-      {
-        "name": "clean()",
-        "description": "Cleans all `RenderCommand`s in the queue"
-      },
-      {
-        "name": "clear(ClearFlag, const Color4F &, float, unsigned int, float)",
-        "description": "Set clear values for each attachment.\n    @flags Flags to indicate which attachment clear value to be modified.\n    @color The clear color value.\n    @depth The clear depth value.\n    @stencil The clear stencil value."
-      },
-      {
-        "name": "clearDrawStats()",
-        "description": ""
-      },
-      {
-        "name": "createRenderQueue()",
-        "description": "Creates a render queue and returns its Id"
-      },
-      {
-        "name": "getClearColor()",
-        "description": "Get color clear value.\n@return Color clear value."
-      },
-      {
-        "name": "getClearDepth()",
-        "description": "Get depth clear value.\n@return Depth clear value."
-      },
-      {
-        "name": "getClearFlag()",
-        "description": "Get the clear flag.\n@return The clear flag."
-      },
-      {
-        "name": "getClearStencil()",
-        "description": "Get the index when the stencil buffer is cleared.\n@return The index used when the stencil buffer is cleared."
-      },
-      {
-        "name": "getColorAttachment()",
-        "description": "Get color attachment.\n@return Color attachment."
-      },
-      {
-        "name": "getCullMode()",
-        "description": "Get cull mode.\n@return The cull mode."
-      },
-      {
-        "name": "getDepthAttachment()",
-        "description": "Get depth attachment.\n@return Depth attachment."
-      },
-      {
-        "name": "getDepthCompareFunction()",
-        "description": "Get depth compare function.\n@return Depth compare function."
-      },
-      {
-        "name": "getDepthTest()",
-        "description": "Get whether depth test state is enabled or disabled.\n@return true if depth test is enabled, otherwise false."
-      },
-      {
-        "name": "getDepthWrite()",
-        "description": "Get whether writing to depth buffer is enabled or not.\n@return true if enable writing into the depth buffer, false otherwise."
-      },
-      {
-        "name": "getDrawnBatches()",
-        "description": ""
-      },
-      {
-        "name": "getDrawnVertices()",
-        "description": ""
-      },
-      {
-        "name": "getRenderTargetFlag()",
-        "description": "Get the render target flag.\n@return The render target flag."
-      },
-      {
-        "name": "getScissorRect()",
-        "description": ""
-      },
-      {
-        "name": "getScissorTest()",
-        "description": ""
-      },
-      {
-        "name": "getStencilAttachment()",
-        "description": "Get stencil attachment.\n@return Stencil attachment."
-      },
-      {
-        "name": "getStencilCompareFunction()",
-        "description": "Get the stencil test function."
-      },
-      {
-        "name": "getStencilDepthPassOperation()",
-        "description": "Get the stencil action when both the stencil test and the depth test pass, or when the stencil test passes and either there is no depth buffer or depth testing is not enabled."
-      },
-      {
-        "name": "getStencilFailureOperation()",
-        "description": "Get the action to take when the stencil test fails."
-      },
-      {
-        "name": "getStencilPassDepthFailureOperation()",
-        "description": "Get the stencil action when the stencil test passes, but the depth test fails."
-      },
-      {
-        "name": "getStencilReadMask()",
-        "description": "Get the stencil readMask.\n@return Stencil read mask.\n@see `setStencilCompareFunction(backend::CompareFunction func, unsigned int ref, unsigned int readMask)`"
-      },
-      {
-        "name": "getStencilReferenceValue()",
-        "description": "Get stencil reference value set by `setStencilCompareFunction`.\n@return Stencil reference value.\n@see `setStencilCompareFunction(backend::CompareFunction func, unsigned int ref, unsigned int readMask)`"
-      },
-      {
-        "name": "getStencilTest()",
-        "description": "Get whether stencil test is enabled or not.\n@return true if stencil test is enabled, false otherwise."
-      },
-      {
-        "name": "getStencilWriteMask()",
-        "description": "Get the stencil write mask.\n@return Stencil write mask.\n@see `setStencilWriteMask(unsigned int mask)`"
-      },
-      {
-        "name": "getViewport()",
-        "description": "Get viewport."
-      },
-      {
-        "name": "getWinding()",
-        "description": "Get winding mode.\n@return The winding mode."
-      },
-      {
-        "name": "init()",
-        "description": ""
-      },
-      {
-        "name": "popGroup()",
-        "description": "Pops a group from the render queue"
-      },
-      {
-        "name": "pushGroup(int)",
-        "description": "Pushes a group into the render queue"
-      },
-      {
-        "name": "render()",
-        "description": "Renders into the GLView all the queued `RenderCommand` objects"
-      },
-      {
-        "name": "setCullMode(CullMode)",
-        "description": "Fixed-function state\n@param mode Controls if primitives are culled when front facing, back facing, or not culled at all."
-      },
-      {
-        "name": "setDepthCompareFunction(backend::CompareFunction)",
-        "description": "Set depth compare function.\n@param func Specifies the value used for depth buffer comparisons."
-      },
-      {
-        "name": "setDepthTest(bool)",
-        "description": "Enable/disable depth test.\n@param value true means enable depth test, otherwise false."
-      },
-      {
-        "name": "setDepthWrite(bool)",
-        "description": "Enable/disable to update depth buffer.\n@param value true means enable writing into the depth buffer, otherwise false."
-      },
-      {
-        "name": "setRenderTarget(RenderTargetFlag, Texture2D *, Texture2D *, Texture2D *)",
-        "description": "Set render targets. If not set, will use default render targets. It will effect all commands.\n     @flags Flags to indicate which attachment to be replaced.\n     @colorAttachment The value to replace color attachment, only one color attachment supported now.\n     @depthAttachment The value to repalce depth attachment.\n     @stencilAttachment The value to replace stencil attachment. Depth attachment and stencil attachment\n                        can be the same value."
-      },
-      {
-        "name": "setScissorRect(float, float, float, float)",
-        "description": "Fixed-function state\n@param x, y Specifies the lower left corner of the scissor box\n@param wdith Specifies the width of the scissor box\n@param height Specifies the height of the scissor box"
-      },
-      {
-        "name": "setScissorTest(bool)",
-        "description": "Enable/disable scissor test.\n@param enabled true if enable scissor test, false otherwise."
-      },
-      {
-        "name": "setStencilCompareFunction(backend::CompareFunction, unsigned int, unsigned int)",
-        "description": "Set front and back function and reference value for stencil testing.\n@param func Specifies the stencil test function.\n@param ref Specifies the reference value for the stencil test.\n@readMask Specifies a mask that is ANDed with both the reference value and the stored stencil value when the test is done."
-      },
-      {
-        "name": "setStencilOperation(backend::StencilOperation, backend::StencilOperation, backend::StencilOperation)",
-        "description": "Set front and back stencil test actions.\n@param stencilFailureOp Specifies the action to take when the stencil test fails.\n@param depthFailureOp Specifies the stencil action when the stencil test passes, but the depth test fails.\n@param stencilDepthPassOp Specifies the stencil action when both the stencil test and the depth test pass, or when the stencil test passes and either there is no depth buffer or depth testing is not enabled."
-      },
-      {
-        "name": "setStencilTest(bool)",
-        "description": "Enable/disable stencil test.\n@param value true means enable stencil test, otherwise false."
-      },
-      {
-        "name": "setStencilWriteMask(unsigned int)",
-        "description": "Control the front and back writing of individual bits in the stencil planes.\n@param mask Specifies a bit mask to enable and disable writing of individual bits in the stencil planes."
-      },
-      {
-        "name": "setViewPort(int, int, unsigned int, unsigned int)",
-        "description": "Fixed-function state\n@param x The x coordinate of the upper-left corner of the viewport.\n@param y The y coordinate of the upper-left corner of the viewport.\n@param w The width of the viewport, in pixels.\n@param h The height of the viewport, in pixels."
-      },
-      {
-        "name": "setWinding(Winding)",
-        "description": "Fixed-function state\n@param winding The winding order of front-facing primitives."
-      }
-    ],
-    "children": []
-  },
-  {
     "name": "FileUtils",
     "description": "Helper class to handle file operations.",
     "header": "cocos/platform/CCFileUtils.h",
@@ -37497,52 +37431,7 @@
         "description": "write ValueVector into a plist file\n\n@param vecData the ValueVector want to save\n@param fullPath The full path to the file you want to save a string\n@return bool"
       }
     ],
-    "children": [
-      {
-        "name": "FileUtilsApple",
-        "description": "@brief  Helper class to handle file operations",
-        "header": "cocos/platform/apple/CCFileUtils-apple.h",
-        "methods": [
-          {
-            "name": "createDirectory(const std::string &)",
-            "description": ""
-          },
-          {
-            "name": "getFullPathForFilenameWithinDirectory(const std::string &, const std::string &)",
-            "description": ""
-          },
-          {
-            "name": "getPathForDirectory(const std::string &, const std::string &, const std::string &)",
-            "description": ""
-          },
-          {
-            "name": "getValueMapFromData(const char *, int)",
-            "description": ""
-          },
-          {
-            "name": "getValueMapFromFile(const std::string &)",
-            "description": ""
-          },
-          {
-            "name": "getValueVectorFromFile(const std::string &)",
-            "description": ""
-          },
-          {
-            "name": "getWritablePath()",
-            "description": ""
-          },
-          {
-            "name": "setBundle(NSBundle *)",
-            "description": ""
-          },
-          {
-            "name": "writeToFile(const ValueMap &, const std::string &)",
-            "description": ""
-          }
-        ],
-        "children": []
-      }
-    ]
+    "children": []
   },
   {
     "name": "AudioEngine",

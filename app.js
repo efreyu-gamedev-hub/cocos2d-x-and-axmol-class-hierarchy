@@ -301,7 +301,23 @@ function update(source) {
     const nodes = allDescendants.filter(d => !d.data.__virtual);
     const links = allDescendants.filter(d => d.parent && !d.data.__virtual);
 
-    allDescendants.forEach(d => d.y = d.depth * 220);
+    // Compute horizontal positions based on max node width per depth level
+    const maxWidthByDepth = {};
+    allDescendants.forEach(d => {
+        if (d.data.__virtual) return;
+        const w = getNodeWidth(d);
+        maxWidthByDepth[d.depth] = Math.max(maxWidthByDepth[d.depth] || 0, w);
+    });
+    const depthX = {};
+    let cumX = 0;
+    const depths = Object.keys(maxWidthByDepth).map(Number).sort((a, b) => a - b);
+    depths.forEach(depth => {
+        depthX[depth] = cumX;
+        cumX += (maxWidthByDepth[depth] || 100) + 60; // 60px gap between columns
+    });
+    allDescendants.forEach(d => {
+        d.y = depthX[d.depth] !== undefined ? depthX[d.depth] : d.depth * 220;
+    });
 
     // --- Nodes ---
     const node = gTree.selectAll('g.node')
@@ -490,17 +506,19 @@ function loadEngine(src, updateHash = true) {
             // Store references to top-level roots
             roots = vroot.children || [];
 
-            // Collapse children of each root by default (keep roots visible)
-            // Exception: "Node" stays expanded at first level
+            // Collapse all, then re-expand nodes marked with "opened": true
+            function collapseRespectingOpened(node) {
+                if (node.children) {
+                    node.children.forEach(collapseRespectingOpened);
+                    if (!node.data.opened) {
+                        node._children = node.children;
+                        node.children = null;
+                    }
+                }
+            }
             roots.forEach(r => {
                 if (r.children) {
-                    r.children.forEach(child => {
-                        if (child.data.name === "Node" && child.children) {
-                            child.children.forEach(collapseAll);
-                        } else {
-                            collapseAll(child);
-                        }
-                    });
+                    r.children.forEach(collapseRespectingOpened);
                 }
             });
 

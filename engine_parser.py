@@ -395,15 +395,12 @@ def parse_translation_units(clang, cc_entries: List[dict], project_dir: Path) ->
 
         print(f"\r  [{idx+1}/{total}] {os.path.basename(file_)}", end="", flush=True)
 
-        # Determine project root to skip system/external headers during traversal
-        project_prefix = normalize_path(os.path.dirname(key)).rsplit("/external/", 1)[0]
-
         def visit(cursor):
             # Skip cursors from files outside the project
             loc = cursor.location
             if loc and loc.file:
                 fpath = normalize_path(str(loc.file))
-                if not fpath.startswith(project_prefix):
+                if not fpath.startswith(project_root):
                     return
 
             # Collect class/struct definitions
@@ -519,15 +516,21 @@ def build_tree(classes: Dict[str, dict], derived_map: Dict[str, Set[str]], root_
         children_names = sorted(derived_map.get(name, set()))
         children = [node(ch) for ch in children_names]
 
-        return {
+        result = {
             "name": info.get("name", name),
             "description": info.get("description", ""),
             "header": info.get("header", ""),
             "methods": info.get("methods", []),
             "children": children,
         }
+        if name in OPENED_CLASSES:
+            result["opened"] = True
+        return result
 
     return node(root_name)
+
+# Classes that should be expanded by default in the UI
+OPENED_CLASSES = {"Node"}
 
 ROOT_CLASSES = [
     "Ref",
