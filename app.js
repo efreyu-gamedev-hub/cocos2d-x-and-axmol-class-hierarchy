@@ -30,10 +30,53 @@ const MAIN_NODES = new Set([
     "MotionStreak",
     "ParallaxNode",
     "ProtectedNode",
-    "Widget", "EditBox", "AbstractCheckButton", "CheckBox", "RadioButton", "TabHeader", "Button", "ImageView", "Layout", "LoadingBar", "MediaController", "MediaPlayer", "RadioButtonGroup", "RichText",
-    "Slider", "TabControl", "Text", "TextAtlas", "TextBMFont", "TextField", "TextFieldEx",
-    "RenderTexture", "ScrollViewBar", "ScrollView", "ListView", "PageView", "TableView", "Control", "ControlButton", "ControlColourPicker", "ControlHuePicker", "ControlPotentiometer", "ControlSaturationBrightnessPicker", "ControlSlider", "ControlStepper",
-    "ControlSwitch", "VBox", "RelativeBox", "HBox", "NodeGrid"
+    "Widget",
+    "EditBox",
+    "AbstractCheckButton",
+    "CheckBox",
+    "RadioButton",
+    "TabHeader",
+    "Button",
+    "ImageView",
+    "Layout",
+    "LoadingBar",
+    "MediaController",
+    "MediaPlayer",
+    "RadioButtonGroup",
+    "RichText",
+    "Slider",
+    "TabControl",
+    "Text",
+    "TextAtlas",
+    "TextBMFont",
+    "TextField",
+    "TextFieldEx",
+    "RenderTexture",
+    "ScrollViewBar",
+    "ScrollView",
+    "ListView",
+    "PageView",
+    "TableView",
+    "Control",
+    "ControlButton",
+    "ControlColourPicker",
+    "ControlHuePicker",
+    "ControlPotentiometer",
+    "ControlSaturationBrightnessPicker",
+    "ControlSlider",
+    "ControlStepper",
+    "ControlSwitch",
+    "VBox",
+    "RelativeBox",
+    "HBox",
+    "NodeGrid",
+    "MenuItemLabel",
+    "MenuItemLabel",
+    "MenuItemAtlasFont",
+    "MenuItemFont",
+    "MenuItemSprite",
+    "MenuItemImage",
+    "MenuItemToggle"
 ]);
 
 // --- Layout ---
@@ -559,7 +602,22 @@ function rebuildTree() {
     });
 
     update(vroot);
-    fitView();
+
+    // Center on Ref or Object if present, otherwise fit view
+    const focusNames = ["Ref", "Object"];
+    let focusNode = null;
+    allNodes = [];
+    flattenTree(vroot, allNodes);
+    for (const name of focusNames) {
+        focusNode = allNodes.find(n => n.data.name === name);
+        if (focusNode) break;
+    }
+    if (focusNode) {
+        selectNode(focusNode);
+        centerOnNode(focusNode);
+    } else {
+        fitView();
+    }
 }
 
 // --- Load data ---

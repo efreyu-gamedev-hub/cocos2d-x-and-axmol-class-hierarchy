@@ -18072,6 +18072,7 @@
             "name": "MenuItem",
             "description": "@brief MenuItem base class.\n\n Subclass MenuItem (or any subclass) to create your custom MenuItem objects.",
             "header": "cocos/2d/CCMenuItem.h",
+            "opened": true,
             "methods": [
               {
                 "name": "activate()",

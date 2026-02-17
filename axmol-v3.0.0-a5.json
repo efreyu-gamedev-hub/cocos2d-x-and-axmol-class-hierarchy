@@ -17567,6 +17567,7 @@
                 "description": "The item was unselected."
               }
             ],
+            "opened": true,
             "children": [
               {
                 "name": "MenuItemLabel",
