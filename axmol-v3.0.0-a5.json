@@ -15245,6 +15245,7 @@
             "name": "Layer",
             "description": "@addtogroup _2d\n@{",
             "header": "axmol/2d/Layer.h",
+            "opened": true,
             "methods": [
               {
                 "name": "create()",
@@ -15346,6 +15347,7 @@
                     "description": "A Boolean value that determines the control selected state."
                   }
                 ],
+                "opened": true,
                 "children": [
                   {
                     "name": "ControlButton",
@@ -16161,6 +16163,7 @@
                 "name": "ScrollView",
                 "description": "ScrollView support for cocos2d-x.\nIt provides scroll view functionalities to cocos2d projects natively.",
                 "header": "extensions/GUI/src/GUI/ScrollView/ScrollView.h",
+                "opened": true,
                 "methods": [
                   {
                     "name": "addChild(Node *)",
@@ -16688,6 +16691,7 @@
                     "name": "ListView",
                     "description": "@brief ListView is a view group that displays a list of scrollable items.\nThe list items are inserted to the list by using `addChild` or  `insertDefaultItem`.\n@warning The list item in ListView doesn't support cell reuse at the moment, if you have a large amount of data need\nto be displayed, use  `TableView` instead. ListView is a subclass of  `ScrollView`, so it shares many features of\nScrollView.",
                     "header": "axmol/ui/UIListView.h",
+                    "opened": true,
                     "methods": [
                       {
                         "name": "addChild(Node *)",
@@ -20611,6 +20615,7 @@
                     "name": "AbstractCheckButton",
                     "description": "AbstractCheckButton is a specific type of two-states button that can be either checked or unchecked.",
                     "header": "axmol/ui/UIAbstractCheckButton.h",
+                    "opened": true,
                     "methods": [
                       {
                         "name": "getBackDisabledFile()",
@@ -21437,6 +21442,7 @@
                     "name": "Layout",
                     "description": "@brief A container for holding a few child widgets.\n\nThe child widgets could be rearranged according to the layout type and it also enables clipping, set background image\nand color.\n\nThere are mainly four types of layout:\n- Absolute layout: This the default layout type, child elements are arranged by their absolute position.\n- Horizontal layout: child elements are arranged horizontally.\n- Vertical layout: child elements are arranged vertically.\n- Relative layout: child elements are arranged relative to certain rules.",
                     "header": "axmol/ui/UILayout.h",
+                    "opened": true,
                     "methods": [
                       {
                         "name": "addChild(Node *)",

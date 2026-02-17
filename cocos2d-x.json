@@ -12248,6 +12248,7 @@
         "name": "Node",
         "description": "@class Node\n@brief Node is the base element of the Scene Graph. Elements of the Scene Graph must be Node objects or subclasses of it.\n The most common Node objects are: Scene, Layer, Sprite, Menu, Label.\n\n The main features of a Node are:\n - They can contain other Node objects (`addChild`, `getChildByTag`, `removeChild`, etc)\n - They can schedule periodic callback (`schedule`, `unschedule`, etc)\n - They can execute actions (`runAction`, `stopAction`, etc)\n\n Subclassing a Node usually means (one/all) of:\n - overriding init to initialize resources and schedule callbacks\n - create callbacks to handle the advancement of time\n - overriding `draw` to render the node\n\n Properties of Node:\n - position (default: x=0, y=0)\n - scale (default: x=1, y=1)\n - rotation (in degrees, clockwise) (default: 0)\n - anchor point (default: x=0, y=0)\n - contentSize (default: width=0, height=0)\n - visible (default: true)\n\n Limitations:\n - A Node is a \"void\" object. If you want to draw something on the screen, you should use a Sprite instead. Or subclass Node and override `draw`.",
         "header": "cocos/2d/CCNode.h",
+        "opened": true,
         "methods": [
           {
             "name": "_setLocalZOrder(std::int32_t)",
@@ -14752,46 +14753,6 @@
             ]
           },
           {
-            "name": "DrawNode3D",
-            "description": "Copy DrawNode for 3D geometry drawing.",
-            "header": "tests/lua-tests/project/Classes/lua_test_bindings.cpp",
-            "methods": [
-              {
-                "name": "clear()",
-                "description": "Clear the geometry in the node's buffer."
-              },
-              {
-                "name": "create()",
-                "description": "creates and initialize a DrawNode3D node"
-              },
-              {
-                "name": "draw(Renderer *, const Mat4 &, uint32_t)",
-                "description": ""
-              },
-              {
-                "name": "drawCube(Vec3 *, const Color4F &)",
-                "description": "Draw 3D cube\n@param point to a vertex array who has 8 element.\n       vertices[0]:Left-top-front,\n       vertices[1]:Left-bottom-front,\n       vertices[2]:Right-bottom-front,\n       vertices[3]:Right-top-front,\n       vertices[4]:Right-top-back,\n       vertices[5]:Right-bottom-back,\n       vertices[6]:Left-bottom-back,\n       vertices[7]:Left-top-back.\n@param color"
-              },
-              {
-                "name": "drawLine(const Vec3 &, const Vec3 &, const Color4F &)",
-                "description": "Draw 3D Line"
-              },
-              {
-                "name": "getBlendFunc()",
-                "description": "@js NA\n@lua NA"
-              },
-              {
-                "name": "init()",
-                "description": ""
-              },
-              {
-                "name": "setBlendFunc(const BlendFunc &)",
-                "description": "@code\nWhen this function bound into js or lua,the parameter will be changed\nIn js: var setBlendFunc(var src, var dst)\n@endcode\n@lua NA"
-              }
-            ],
-            "children": []
-          },
-          {
             "name": "FastTMXLayer",
             "description": "@brief FastTMXLayer represents the TMX layer.\n\nIt is a subclass of SpriteBatchNode. By default the tiles are rendered using a TextureAtlas.\nIf you modify a tile on runtime, then, that tile will become a Sprite, otherwise no Sprite objects are created.\nThe benefits of using Sprite objects as tiles are:\n- tiles (Sprite) can be rotated/scaled/moved with a nice API.\n\nIf the layer contains a property named \"cc_vertexz\" with an integer (in can be positive or negative),\nthen all the tiles belonging to the layer will use that value as their OpenGL vertex Z for depth.\n\nOn the other hand, if the \"cc_vertexz\" property has the \"automatic\" value, then the tiles will use an automatic vertex Z value.\nAlso before drawing the tiles, GL_ALPHA_TEST will be enabled, and disabled after drawing them. The used alpha func will be:\n\nglAlphaFunc( GL_GREATER, value ).\n\n\"value\" by default is 0, but you can change it from Tiled by adding the \"cc_alpha_func\" property to the layer.\nThe value 0 should work for most cases, but if you have tiles that are semi-transparent, then you might want to use a different\nvalue, like 0.5.\n\nFor further information, please see the programming guide:\nhttp://www.cocos2d-iphone.org/wiki/doku.php/prog_guide:tiled_maps\n\n@since v3.2\n@js NA",
             "header": "cocos/2d/CCFastTMXLayer.h",
@@ -15695,11 +15656,13 @@
                 "description": "Callback function for multiple touches moved.\n\n@param touches Touches information.\n@param unused_event Event information.\n@js NA"
               }
             ],
+            "opened": true,
             "children": [
               {
                 "name": "Control",
                 "description": "",
                 "header": "extensions/GUI/CCControlExtension/CCControl.h",
+                "opened": true,
                 "methods": [
                   {
                     "name": "addTargetWithActionForControlEvents(Ref *, Handler, EventType)",
@@ -16601,6 +16564,7 @@
                 "name": "LayerColor",
                 "description": "@class LayerColor\n@brief LayerColor is a subclass of Layer that implements the RGBAProtocol protocol.\n\nAll features from Layer are valid, plus the following new features:\n- opacity\n- RGB colors",
                 "header": "cocos/2d/CCLayer.h",
+                "opened": true,
                 "methods": [
                   {
                     "name": "changeHeight(float)",
@@ -17050,6 +17014,7 @@
                 "name": "ScrollView",
                 "description": "Layout container for a view hierarchy that can be scrolled by the user, allowing it to be larger than the physical display.\nIt holds a inner `Layout` container for storing child items horizontally or vertically.",
                 "header": "cocos/ui/UIScrollView.h",
+                "opened": true,
                 "methods": [
                   {
                     "name": "addChild(Node *)",
@@ -17553,6 +17518,7 @@
                     "name": "ListView",
                     "description": "@brief ListView is a view group that displays a list of scrollable items.\nThe list items are inserted to the list by using `addChild` or  `insertDefaultItem`.\n@warning The list item in ListView doesn't support cell reuse at the moment, if you have a large amount of data need to be displayed, use  `TableView` instead.\nListView is a subclass of  `ScrollView`, so it shares many features of ScrollView.",
                     "header": "cocos/ui/UIListView.h",
+                    "opened": true,
                     "methods": [
                       {
                         "name": "addChild(Node *)",
@@ -20180,6 +20146,7 @@
             "name": "ProtectedNode",
             "description": "@brief A inner node type mainly used for UI module.\nIt is useful for composing complex node type and it's children are protected.",
             "header": "cocos/2d/CCProtectedNode.h",
+            "opened": true,
             "methods": [
               {
                 "name": "addProtectedChild(Node *)",
@@ -20435,6 +20402,7 @@
                 "name": "Widget",
                 "description": "@brief Base class for all ui widgets.\nThis class inherent from `ProtectedNode` and `LayoutParameterProtocol`.\nIf you want to implements your own ui widget, you should subclass it.",
                 "header": "cocos/ui/UIWidget.h",
+                "opened": true,
                 "methods": [
                   {
                     "name": "addCCSEventListener(const ccWidgetEventCallback &)",
@@ -20802,6 +20770,7 @@
                     "name": "AbstractCheckButton",
                     "description": "AbstractCheckButton is a specific type of two-states button that can be either checked or unchecked.",
                     "header": "cocos/ui/UIAbstractCheckButton.h",
+                    "opened": true,
                     "methods": [
                       {
                         "name": "getBackDisabledFile()",
@@ -21587,6 +21556,7 @@
                     "name": "Layout",
                     "description": "@brief A container for holding a few child widgets.\n\nThe child widgets could be rearranged according to the layout type and it also enables clipping, set background image and color.\n\nThere are mainly four types of layout:\n- Absolute layout: This the default layout type, child elements are arranged by their absolute position.\n- Horizontal layout: child elements are arranged horizontally.\n- Vertical layout: child elements are arranged vertically.\n- Relative layout: child elements are arranged relative to certain rules.",
                     "header": "cocos/ui/UILayout.h",
+                    "opened": true,
                     "methods": [
                       {
                         "name": "addChild(Node *)",

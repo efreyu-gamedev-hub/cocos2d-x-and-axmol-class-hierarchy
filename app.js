@@ -1,7 +1,40 @@
 // --- State ---
 let roots = [], selectedNode = null, currentSrc = null;
+let rawData = null; // raw JSON data for re-filtering
 let i = 0;
 const duration = 500;
+
+// --- Main nodes filter ---
+// Only these classes (and their descendants) are shown when "Main only" is checked
+const MAIN_NODES = new Set([
+    "Object", "Ref",
+    "Node", "Scene", "Layer", "Sprite", "Label", "ParticleSystem", "LayerColor", "LayerGradient", "LayerMultiplex", "LayerRadialGradient",
+    "Action", "FiniteTimeAction", "ActionInterval", "ActionInstant",
+    "Director",
+    "Event", "EventListener",
+    "Component",
+    "Scheduler",
+    "Renderer",
+    "TextureCache", "SpriteFrameCache",
+    "FileUtils",
+    "AudioEngine",
+    "Camera",
+    "PhysicsWorld", "PhysicsBody",
+    "TMXTiledMap",
+    "DrawNode",
+    "ClippingNode",
+    "RenderTexture",
+    "SpriteBatchNode",
+    "Menu", "MenuItem",
+    "ProgressTimer",
+    "MotionStreak",
+    "ParallaxNode",
+    "ProtectedNode",
+    "Widget", "EditBox", "AbstractCheckButton", "CheckBox", "RadioButton", "TabHeader", "Button", "ImageView", "Layout", "LoadingBar", "MediaController", "MediaPlayer", "RadioButtonGroup", "RichText",
+    "Slider", "TabControl", "Text", "TextAtlas", "TextBMFont", "TextField", "TextFieldEx",
+    "RenderTexture", "ScrollViewBar", "ScrollView", "ListView", "PageView", "TableView", "Control", "ControlButton", "ControlColourPicker", "ControlHuePicker", "ControlPotentiometer", "ControlSaturationBrightnessPicker", "ControlSlider", "ControlStepper",
+    "ControlSwitch", "VBox", "RelativeBox", "HBox",
+]);
 
 // --- Layout ---
 const PANEL_WIDTH = 380;
@@ -71,6 +104,23 @@ function countVisibleNodes(d) {
     let count = 0;
     d.children.forEach(c => count += countVisibleNodes(c));
     return Math.max(count, 1);
+}
+
+// --- Tree filtering ---
+function filterTree(node, allowedNames) {
+    if (!node) return null;
+    const dominated = allowedNames.has(node.name);
+    const filteredChildren = (node.children || [])
+        .map(c => filterTree(c, allowedNames))
+        .filter(Boolean);
+    if (dominated || filteredChildren.length > 0) {
+        return { ...node, children: filteredChildren };
+    }
+    return null;
+}
+
+function isMainOnly() {
+    return document.getElementById("cb-main-only").checked;
 }
 
 // --- Preloader ---
@@ -461,6 +511,54 @@ function update(source) {
     }
 }
 
+// --- Build tree from raw data ---
+function rebuildTree() {
+    if (!rawData) return;
+
+    selectedNode = null;
+    renderDetail(null);
+    gTree.selectAll('*').remove();
+    i = 0;
+
+    let arr = Array.isArray(rawData) ? rawData : [rawData];
+
+    // Apply main-only filter
+    if (isMainOnly()) {
+        arr = arr.map(tree => filterTree(tree, MAIN_NODES)).filter(Boolean);
+    }
+
+    const virtualRoot = {
+        name: "__root__",
+        __virtual: true,
+        children: arr,
+    };
+
+    const vroot = d3.hierarchy(virtualRoot, d => d.children);
+    vroot.x0 = getTreeSize().height / 2;
+    vroot.y0 = 0;
+
+    roots = vroot.children || [];
+
+    // Collapse all, then re-expand nodes marked with "opened": true
+    function collapseRespectingOpened(node) {
+        if (node.children) {
+            node.children.forEach(collapseRespectingOpened);
+            if (!node.data.opened) {
+                node._children = node.children;
+                node.children = null;
+            }
+        }
+    }
+    roots.forEach(r => {
+        if (r.children) {
+            r.children.forEach(collapseRespectingOpened);
+        }
+    });
+
+    update(vroot);
+    fitView();
+}
+
 // --- Load data ---
 function loadEngine(src, updateHash = true) {
     if (src === currentSrc) return;
@@ -476,12 +574,6 @@ function loadEngine(src, updateHash = true) {
     });
 
     showPreloader();
-    selectedNode = null;
-    renderDetail(null);
-
-    // Clear existing tree
-    gTree.selectAll('*').remove();
-    i = 0;
 
     fetch(src)
         .then(r => {
@@ -489,42 +581,9 @@ function loadEngine(src, updateHash = true) {
             return r.json();
         })
         .then(data => {
-            // data is an array of root trees
-            const arr = Array.isArray(data) ? data : [data];
-
-            // Create virtual root to hold multiple trees
-            const virtualRoot = {
-                name: "__root__",
-                __virtual: true,
-                children: arr,
-            };
-
-            const vroot = d3.hierarchy(virtualRoot, d => d.children);
-            vroot.x0 = getTreeSize().height / 2;
-            vroot.y0 = 0;
-
-            // Store references to top-level roots
-            roots = vroot.children || [];
-
-            // Collapse all, then re-expand nodes marked with "opened": true
-            function collapseRespectingOpened(node) {
-                if (node.children) {
-                    node.children.forEach(collapseRespectingOpened);
-                    if (!node.data.opened) {
-                        node._children = node.children;
-                        node.children = null;
-                    }
-                }
-            }
-            roots.forEach(r => {
-                if (r.children) {
-                    r.children.forEach(collapseRespectingOpened);
-                }
-            });
-
+            rawData = data;
             hidePreloader();
-            update(vroot);
-            fitView();
+            rebuildTree();
         })
         .catch(err => {
             hidePreloader();
@@ -534,6 +593,9 @@ function loadEngine(src, updateHash = true) {
             );
         });
 }
+
+// --- Main only checkbox ---
+document.getElementById("cb-main-only").addEventListener("change", () => rebuildTree());
 
 // --- Engine tabs ---
 document.querySelectorAll('.engine-tab').forEach(tab => {

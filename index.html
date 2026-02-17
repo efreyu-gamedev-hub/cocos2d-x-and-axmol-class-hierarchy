@@ -63,6 +63,22 @@
             color: #fff;
         }
 
+        .filter-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #94a3b8;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        .filter-toggle input {
+            accent-color: #6366f1;
+            cursor: pointer;
+        }
+
         /* --- Preloader --- */
         .preloader-overlay {
             position: absolute;
@@ -422,9 +438,13 @@
         <div class="header-left">
             <div class="engine-tabs">
                 <button class="engine-tab active" data-src="cocos2d-x.json" data-hash="cocos2d-x">cocos2d-x v4</button>
-                <button class="engine-tab" data-src="axmol-v2.11.2.json" data-hash="axmol-v2">axmol v2.11.2</button>
+<!--                <button class="engine-tab" data-src="axmol-v2.11.2.json" data-hash="axmol-v2">axmol v2.11.2</button>-->
                 <button class="engine-tab" data-src="axmol-v3.0.0-a5.json" data-hash="axmol-v3">axmol v3.0.0</button>
             </div>
+            <label class="filter-toggle">
+                <input type="checkbox" id="cb-main-only" checked>
+                <span>Main only</span>
+            </label>
             <div class="search-wrapper">
                 <span class="search-icon">&#128269;</span>
                 <input type="text" id="search-input" placeholder="Search classes..." autocomplete="off">
