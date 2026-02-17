@@ -6,10 +6,10 @@ Interactive visualization of the Cocos2d-x and Axmol engine class hierarchy. Exp
 
 ## Live Demo
 
-https://efreyu-learning-hub.github.io/node_tree/
+https://efreyu-learning-hub.github.io/cocos2d-x-and-axmol-class-hierarchy/
 
 ## Contributing
 
 Fork the repo and send a pull request — any contributions are welcome!
 
-https://github.com/efreyu-learning-hub/node_tree/
+https://github.com/efreyu-learning-hub/cocos2d-x-and-axmol-class-hierarchy/
