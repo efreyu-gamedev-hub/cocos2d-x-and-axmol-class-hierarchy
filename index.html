@@ -34,15 +34,70 @@
             gap: 16px;
         }
 
-        .header h1 {
-            font-size: 16px;
-            font-weight: 600;
-            color: #f1f5f9;
+        .engine-tabs {
+            display: flex;
+            gap: 4px;
+        }
+
+        .engine-tab {
+            background: #334155;
+            border: 1px solid #475569;
+            color: #94a3b8;
+            padding: 5px 14px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
             white-space: nowrap;
         }
 
-        .header h1 span {
-            color: #6366f1;
+        .engine-tab:hover {
+            background: #475569;
+            color: #f1f5f9;
+        }
+
+        .engine-tab.active {
+            background: #6366f1;
+            border-color: #818cf8;
+            color: #fff;
+        }
+
+        /* --- Preloader --- */
+        .preloader-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            transition: opacity 0.3s;
+        }
+
+        .preloader-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .preloader-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #334155;
+            border-top-color: #6366f1;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .preloader-text {
+            margin-top: 12px;
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         .search-wrapper {
@@ -365,7 +420,11 @@
 <body>
     <div class="header">
         <div class="header-left">
-            <h1><span>Cocos2d-x</span> / Axmol Class Hierarchy</h1>
+            <div class="engine-tabs">
+                <button class="engine-tab active" data-src="cocos2d-x.json" data-hash="cocos2d-x">cocos2d-x v4</button>
+                <button class="engine-tab" data-src="axmol-v2.11.2.json" data-hash="axmol-v2">axmol v2.11.2</button>
+                <button class="engine-tab" data-src="axmol-v3.0.0-a5.json" data-hash="axmol-v3">axmol v3.0.0</button>
+            </div>
             <div class="search-wrapper">
                 <span class="search-icon">&#128269;</span>
                 <input type="text" id="search-input" placeholder="Search classes..." autocomplete="off">
@@ -386,6 +445,10 @@
     <div class="main">
         <div id="canvas">
             <div class="hint">Scroll to zoom &middot; Drag to pan &middot; Click to select &middot; Double-click to expand/collapse</div>
+            <div class="preloader-overlay" id="preloader">
+                <div class="preloader-spinner"></div>
+                <div class="preloader-text">Loading class hierarchy...</div>
+            </div>
         </div>
         <div class="detail-panel" id="detail-content">
             <div class="detail-empty">Click on a node to see its details</div>

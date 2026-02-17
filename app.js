@@ -1,5 +1,5 @@
 // --- State ---
-let root, selectedNode = null;
+let roots = [], selectedNode = null, currentSrc = null;
 let i = 0;
 const duration = 500;
 
@@ -45,8 +45,10 @@ const depthColors = [
     "#ec4899", // 7 - pink
 ];
 
-function getColor(depth) {
-    return depthColors[depth % depthColors.length];
+function getColor(d) {
+    // Use custom color from data if available, otherwise depth-based
+    if (d.data && d.data.color) return d.data.color;
+    return depthColors[(d.depth - 1) % depthColors.length];
 }
 
 // --- Node width calculation ---
@@ -71,60 +73,66 @@ function countVisibleNodes(d) {
     return Math.max(count, 1);
 }
 
+// --- Preloader ---
+const preloader = document.getElementById("preloader");
+
+function showPreloader() {
+    preloader.classList.remove("hidden");
+}
+
+function hidePreloader() {
+    preloader.classList.add("hidden");
+}
+
 // --- Detail panel rendering ---
 function renderDetail(d) {
     const panel = d3.select("#detail-content");
-    if (!d) {
+    if (!d || d.data.__virtual) {
         panel.html(`<div class="detail-empty">Click on a node to see its details</div>`);
         return;
     }
     const data = d.data;
-    const color = getColor(d.depth);
+    const color = getColor(d);
     const childCount = (d.children || d._children || []).length;
     const totalDesc = countDescendants(d);
 
     let html = `
         <div class="detail-header" style="border-left: 4px solid ${color}; padding-left: 12px;">
-            <div class="detail-name" style="color: ${color}">${data.name}</div>
-            <div class="detail-header-file">${data.header || ''}</div>
+            <div class="detail-name" style="color: ${color}">${escapeHtml(data.name)}</div>
+            <div class="detail-header-file">${escapeHtml(data.header || '')}</div>
         </div>
-        <div class="detail-description">${data.description || ''}</div>
+        <div class="detail-description">${escapeHtml(data.description || '')}</div>
         <div class="detail-stats">
-            <span class="stat-badge">Depth: ${d.depth}</span>
+            <span class="stat-badge">Depth: ${d.depth - 1}</span>
             ${childCount > 0 ? `<span class="stat-badge">Children: ${childCount}</span>` : ''}
             ${totalDesc > 0 ? `<span class="stat-badge">Total subtree: ${totalDesc}</span>` : ''}
         </div>
     `;
 
-    if (data.properties && data.properties.length > 0) {
-        html += `<div class="detail-section">
-            <div class="detail-section-title">Properties</div>
-            <ul class="detail-list detail-list-props">
-                ${data.properties.map(p => `<li>${escapeHtml(p)}</li>`).join('')}
-            </ul>
-        </div>`;
-    }
-
     if (data.methods && data.methods.length > 0) {
         html += `<div class="detail-section">
-            <div class="detail-section-title">Methods</div>
+            <div class="detail-section-title">Methods (${data.methods.length})</div>
             <ul class="detail-list detail-list-methods">
-                ${data.methods.map(m => `<li>${escapeHtml(m)}</li>`).join('')}
+                ${data.methods.map(m => {
+                    const name = typeof m === 'string' ? m : m.name;
+                    const desc = typeof m === 'string' ? '' : (m.description || '');
+                    return `<li title="${escapeHtml(desc)}">${escapeHtml(name)}</li>`;
+                }).join('')}
             </ul>
         </div>`;
     }
 
-    // Ancestry path
+    // Ancestry path (skip virtual root)
     const path = [];
     let current = d;
     while (current) {
-        path.unshift(current.data.name);
+        if (!current.data.__virtual) path.unshift(current.data.name);
         current = current.parent;
     }
     if (path.length > 1) {
         html += `<div class="detail-section">
             <div class="detail-section-title">Inheritance</div>
-            <div class="detail-breadcrumb">${path.join(' → ')}</div>
+            <div class="detail-breadcrumb">${path.map(escapeHtml).join(' &rarr; ')}</div>
         </div>`;
     }
 
@@ -143,38 +151,43 @@ const searchResults = document.getElementById("search-results");
 let allNodes = [];
 
 function flattenTree(node, arr) {
-    arr.push(node);
+    if (!node.data.__virtual) arr.push(node);
     if (node.children) node.children.forEach(c => flattenTree(c, arr));
     if (node._children) node._children.forEach(c => flattenTree(c, arr));
 }
 
+function getVirtualRoot() {
+    return roots.length > 0 ? roots[0].parent : null;
+}
+
 function doSearch(query) {
-    if (!query || query.length < 2) {
+    const vroot = getVirtualRoot();
+    if (!query || query.length < 2 || !vroot) {
         searchResults.style.display = "none";
         return;
     }
     const q = query.toLowerCase();
     allNodes = [];
-    flattenTree(root, allNodes);
+    flattenTree(vroot, allNodes);
     const matches = allNodes.filter(n => n.data.name.toLowerCase().includes(q)).slice(0, 10);
     if (matches.length === 0) {
         searchResults.style.display = "none";
         return;
     }
     searchResults.innerHTML = matches.map(n =>
-        `<div class="search-item" data-name="${n.data.name}">${n.data.name}</div>`
+        `<div class="search-item" data-name="${escapeHtml(n.data.name)}">${escapeHtml(n.data.name)}</div>`
     ).join('');
     searchResults.style.display = "block";
     searchResults.querySelectorAll('.search-item').forEach(el => {
         el.addEventListener('click', () => {
             const name = el.dataset.name;
             allNodes = [];
-            flattenTree(root, allNodes);
+            flattenTree(vroot, allNodes);
             const target = allNodes.find(n => n.data.name === name);
             if (target) {
                 expandToNode(target);
                 selectNode(target);
-                update(root);
+                update(vroot);
                 centerOnNode(target);
             }
             searchResults.style.display = "none";
@@ -199,7 +212,6 @@ function expandToNode(node) {
 }
 
 function centerOnNode(node) {
-    // Wait for transition to finish then center
     setTimeout(() => {
         const size = getTreeSize();
         const x = -(node.y) + size.width / 3;
@@ -218,15 +230,20 @@ searchInput.addEventListener('blur', () => {
 
 // --- Collapse / Expand All ---
 document.getElementById("btn-collapse").addEventListener("click", () => {
-    collapseAll(root);
-    root.children = root._children;
-    root._children = null;
-    update(root);
+    const vroot = getVirtualRoot();
+    if (!vroot) return;
+    collapseAll(vroot);
+    // Keep virtual root and first-level roots expanded
+    vroot.children = vroot._children;
+    vroot._children = null;
+    update(vroot);
 });
 
 document.getElementById("btn-expand").addEventListener("click", () => {
-    expandAll(root);
-    update(root);
+    const vroot = getVirtualRoot();
+    if (!vroot) return;
+    expandAll(vroot);
+    update(vroot);
 });
 
 document.getElementById("btn-fit").addEventListener("click", fitView);
@@ -248,7 +265,6 @@ function expandAll(d) {
 }
 
 function fitView() {
-    const size = getTreeSize();
     svg.transition().duration(500).call(
         zoom.transform,
         d3.zoomIdentity.translate(margin.left, margin.top).scale(1)
@@ -259,7 +275,6 @@ function fitView() {
 function selectNode(d) {
     selectedNode = d;
     renderDetail(d);
-    // Highlight
     gTree.selectAll('g.node').classed('selected', false);
     gTree.selectAll('g.node')
         .filter(n => n === d)
@@ -268,7 +283,10 @@ function selectNode(d) {
 
 // --- Main update ---
 function update(source) {
-    const visibleCount = countVisibleNodes(root);
+    const vroot = getVirtualRoot();
+    if (!vroot) return;
+
+    const visibleCount = countVisibleNodes(vroot);
     const nodeHeight = 36;
     const treeHeight = Math.max(visibleCount * nodeHeight, getTreeSize().height);
     const treeWidth = getTreeSize().width;
@@ -277,11 +295,13 @@ function update(source) {
         .size([treeHeight, treeWidth - 160])
         .separation((a, b) => a.parent === b.parent ? 1 : 1.2);
 
-    const treeData = treeMap(root);
-    const nodes = treeData.descendants();
-    const links = treeData.descendants().slice(1);
+    const treeData = treeMap(vroot);
+    const allDescendants = treeData.descendants();
+    // Filter out the virtual root from rendering
+    const nodes = allDescendants.filter(d => !d.data.__virtual);
+    const links = allDescendants.filter(d => d.parent && !d.data.__virtual);
 
-    nodes.forEach(d => d.y = d.depth * 220);
+    allDescendants.forEach(d => d.y = d.depth * 220);
 
     // --- Nodes ---
     const node = gTree.selectAll('g.node')
@@ -293,7 +313,6 @@ function update(source) {
         .on('click', (event, d) => {
             event.stopPropagation();
             if (event.ctrlKey || event.metaKey) {
-                // Toggle collapse with Ctrl/Cmd+click
                 if (d.children) { d._children = d.children; d.children = null; }
                 else if (d._children) { d.children = d._children; d._children = null; }
                 update(d);
@@ -308,7 +327,6 @@ function update(source) {
             update(d);
         });
 
-    // Node background pill
     nodeEnter.append('rect')
         .attr('class', 'node-bg')
         .attr('rx', 6)
@@ -318,7 +336,6 @@ function update(source) {
         .attr('width', 16)
         .attr('height', 28);
 
-    // Input port (left side)
     nodeEnter.append('circle')
         .attr('class', 'node-port-in')
         .attr('r', 4)
@@ -331,13 +348,11 @@ function update(source) {
         .attr("x", 12)
         .text(d => d.data.name);
 
-    // Output port (right side, only visible when has children)
     nodeEnter.append('circle')
         .attr('class', 'node-port-out')
         .attr('r', 4)
         .attr('cy', 0);
 
-    // Children count badge
     nodeEnter.append('text')
         .attr('class', 'node-badge')
         .attr("dy", ".35em");
@@ -351,28 +366,26 @@ function update(source) {
         .transition().duration(duration)
         .attr('width', d => getNodeWidth(d))
         .style("fill", d => {
-            if (selectedNode === d) return getColor(d.depth);
-            return d._children ? getColor(d.depth) + '22' : 'transparent';
+            if (selectedNode === d) return getColor(d);
+            return d._children ? getColor(d) + '22' : 'transparent';
         })
-        .style("stroke", d => getColor(d.depth))
+        .style("stroke", d => getColor(d))
         .style("stroke-width", d => selectedNode === d ? '2px' : '1px');
 
-    // Input port (left)
     nodeUpdate.select('.node-port-in')
-        .style("fill", d => d.parent ? getColor(d.depth) : '#fff')
-        .style("stroke", d => getColor(d.depth))
+        .style("fill", d => d.parent && !d.parent.data.__virtual ? getColor(d) : '#fff')
+        .style("stroke", d => getColor(d))
         .style("stroke-width", '2px')
-        .style("display", d => d.parent ? 'block' : 'none');
+        .style("display", d => d.parent && !d.parent.data.__virtual ? 'block' : 'none');
 
-    // Output port (right)
     nodeUpdate.select('.node-port-out')
         .attr('cx', d => getNodeWidth(d))
         .style("fill", d => {
-            if (d._children) return getColor(d.depth);
+            if (d._children) return getColor(d);
             if (d.children) return '#fff';
             return 'none';
         })
-        .style("stroke", d => (d.children || d._children) ? getColor(d.depth) : 'none')
+        .style("stroke", d => (d.children || d._children) ? getColor(d) : 'none')
         .style("stroke-width", '2px')
         .style("display", d => (d.children || d._children) ? 'block' : 'none');
 
@@ -385,7 +398,7 @@ function update(source) {
             const count = (d._children || []).length;
             return count > 0 ? `+${count}` : '';
         })
-        .style("fill", d => getColor(d.depth))
+        .style("fill", d => getColor(d))
         .attr("x", d => getNodeWidth(d) + 10);
 
     nodeUpdate.classed('selected', d => selectedNode === d);
@@ -395,12 +408,12 @@ function update(source) {
         .remove();
 
     nodeExit.select('.node-bg').style('opacity', 0);
-    nodeExit.select('.node-indicator').style('opacity', 0);
     nodeExit.select('.node-label').style('opacity', 0);
 
-    // --- Links ---
+    // --- Links (skip links from virtual root to top-level roots) ---
+    const linkData = links.filter(d => !d.parent.data.__virtual);
     const link = gTree.selectAll('path.link')
-        .data(links, d => d.id);
+        .data(linkData, d => d.id);
 
     const linkEnter = link.enter().insert('path', "g")
         .attr("class", "link")
@@ -411,7 +424,7 @@ function update(source) {
 
     link.merge(linkEnter).transition().duration(duration)
         .attr('d', d => diagonal(d, d.parent))
-        .style('stroke', d => getColor(d.depth) + '55');
+        .style('stroke', d => getColor(d) + '55');
 
     link.exit().transition().duration(duration)
         .attr('d', () => {
@@ -420,10 +433,8 @@ function update(source) {
         })
         .remove();
 
-    nodes.forEach(d => { d.x0 = d.x; d.y0 = d.y; });
+    allDescendants.forEach(d => { d.x0 = d.x; d.y0 = d.y; });
 
-    // s = child node, d = parent node
-    // Link goes from parent's right port to child's left port
     function diagonal(s, d) {
         const parentRight = d.y + getNodeWidth(d);
         const childLeft = s.y;
@@ -434,29 +445,107 @@ function update(source) {
     }
 }
 
-// --- Load data and init ---
-fetch('data.json')
-    .then(r => r.json())
-    .then(treeData => {
-        root = d3.hierarchy(treeData, d => d.children);
-        root.x0 = getTreeSize().height / 2;
-        root.y0 = 0;
+// --- Load data ---
+function loadEngine(src, updateHash = true) {
+    if (src === currentSrc) return;
+    currentSrc = src;
 
-        update(root);
-        selectNode(root);
-        fitView();
-    })
-    .catch(err => {
-        console.error("Failed to load data.json:", err);
-        d3.select("#detail-content").html(
-            `<div class="detail-empty" style="color:#ef4444">Error loading data.json. Make sure to serve via HTTP (not file://).</div>`
-        );
+    // Update active tab and URL hash
+    document.querySelectorAll('.engine-tab').forEach(tab => {
+        const isActive = tab.dataset.src === src;
+        tab.classList.toggle('active', isActive);
+        if (isActive && updateHash) {
+            history.replaceState(null, '', '#' + tab.dataset.hash);
+        }
     });
+
+    showPreloader();
+    selectedNode = null;
+    renderDetail(null);
+
+    // Clear existing tree
+    gTree.selectAll('*').remove();
+    i = 0;
+
+    fetch(src)
+        .then(r => {
+            if (!r.ok) throw new Error(`HTTP ${r.status}`);
+            return r.json();
+        })
+        .then(data => {
+            // data is an array of root trees
+            const arr = Array.isArray(data) ? data : [data];
+
+            // Create virtual root to hold multiple trees
+            const virtualRoot = {
+                name: "__root__",
+                __virtual: true,
+                children: arr,
+            };
+
+            const vroot = d3.hierarchy(virtualRoot, d => d.children);
+            vroot.x0 = getTreeSize().height / 2;
+            vroot.y0 = 0;
+
+            // Store references to top-level roots
+            roots = vroot.children || [];
+
+            // Collapse children of each root by default (keep roots visible)
+            // Exception: "Node" stays expanded at first level
+            roots.forEach(r => {
+                if (r.children) {
+                    r.children.forEach(child => {
+                        if (child.data.name === "Node" && child.children) {
+                            child.children.forEach(collapseAll);
+                        } else {
+                            collapseAll(child);
+                        }
+                    });
+                }
+            });
+
+            hidePreloader();
+            update(vroot);
+            fitView();
+        })
+        .catch(err => {
+            hidePreloader();
+            console.error(`Failed to load ${src}:`, err);
+            d3.select("#detail-content").html(
+                `<div class="detail-empty" style="color:#ef4444">Error loading ${escapeHtml(src)}.<br>Make sure to serve via HTTP (not file://).</div>`
+            );
+        });
+}
+
+// --- Engine tabs ---
+document.querySelectorAll('.engine-tab').forEach(tab => {
+    tab.addEventListener('click', () => loadEngine(tab.dataset.src));
+});
+
+// --- Hash navigation ---
+function loadFromHash() {
+    const hash = location.hash.replace('#', '');
+    if (!hash) return false;
+    const tab = document.querySelector(`.engine-tab[data-hash="${hash}"]`);
+    if (tab) {
+        loadEngine(tab.dataset.src, false);
+        return true;
+    }
+    return false;
+}
+
+window.addEventListener('hashchange', () => loadFromHash());
+
+// --- Init: load from hash or default ---
+if (!loadFromHash()) {
+    loadEngine('cocos2d-x.json');
+}
 
 // --- Resize ---
 window.addEventListener('resize', () => {
     resizeSVG();
-    if (root) update(root);
+    const vroot = getVirtualRoot();
+    if (vroot) update(vroot);
 });
 
 // Click on empty area to deselect

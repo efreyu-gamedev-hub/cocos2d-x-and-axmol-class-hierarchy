@@ -493,15 +493,17 @@ def parse_translation_units(clang, cc_entries: List[dict], project_dir: Path) ->
     print(f"\nParsed {len(parsed_files)} files, found {len(classes)} classes.")
     return classes, derived_map, all_names
 
-def build_tree(classes: Dict[str, dict], derived_map: Dict[str, Set[str]], root_name: str) -> dict:
+def build_tree(classes: Dict[str, dict], derived_map: Dict[str, Set[str]], root_name: str,
+               visited: Optional[Set[str]] = None) -> dict:
     """
     Create recursive JSON object for root_name and its descendants.
+    A shared *visited* set prevents the same class from appearing in multiple trees.
     """
-    visited: Set[str] = set()
+    if visited is None:
+        visited = set()
 
     def node(name: str) -> dict:
         if name in visited:
-            # prevent cycles
             info = classes.get(name, {"name": name, "description": "", "header": "", "methods": []})
             return {
                 "name": info.get("name", name),
@@ -527,6 +529,22 @@ def build_tree(classes: Dict[str, dict], derived_map: Dict[str, Set[str]], root_
 
     return node(root_name)
 
+ROOT_CLASSES = [
+    "Ref",
+    "Object",
+    "Action",
+    "Component",
+    "Event",
+    "EventListener",
+    "Scheduler",
+    "Director",
+    "Renderer",
+    "TextureCache",
+    "SpriteFrameCache",
+    "FileUtils",
+    "AudioEngine",
+]
+
 # ----------------------------
 # Entrypoint
 # ----------------------------
@@ -550,13 +568,18 @@ def main() -> int:
     cc_entries = load_compile_commands(cc_path)
     classes, derived_map, _all = parse_translation_units(clang, cc_entries, project_dir)
 
-    # If Ref isn't found, still emit a minimal root
-    root = build_tree(classes, derived_map, "Object")
+    # Build a forest: one tree per root class (shared visited set avoids duplicates)
+    visited: Set[str] = set()
+    forest: List[dict] = []
+    for root_name in ROOT_CLASSES:
+        if root_name in classes or root_name in derived_map:
+            tree = build_tree(classes, derived_map, root_name, visited)
+            forest.append(tree)
 
     # 3) write output
     out_json.parent.mkdir(parents=True, exist_ok=True)
     with out_json.open("w", encoding="utf-8") as f:
-        json.dump(root, f, ensure_ascii=False, indent=2)
+        json.dump(forest, f, ensure_ascii=False, indent=2)
 
     print(f"OK: wrote {out_json}")
     return 0
