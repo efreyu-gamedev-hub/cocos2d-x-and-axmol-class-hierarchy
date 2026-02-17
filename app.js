@@ -33,7 +33,7 @@ const MAIN_NODES = new Set([
     "Widget", "EditBox", "AbstractCheckButton", "CheckBox", "RadioButton", "TabHeader", "Button", "ImageView", "Layout", "LoadingBar", "MediaController", "MediaPlayer", "RadioButtonGroup", "RichText",
     "Slider", "TabControl", "Text", "TextAtlas", "TextBMFont", "TextField", "TextFieldEx",
     "RenderTexture", "ScrollViewBar", "ScrollView", "ListView", "PageView", "TableView", "Control", "ControlButton", "ControlColourPicker", "ControlHuePicker", "ControlPotentiometer", "ControlSaturationBrightnessPicker", "ControlSlider", "ControlStepper",
-    "ControlSwitch", "VBox", "RelativeBox", "HBox",
+    "ControlSwitch", "VBox", "RelativeBox", "HBox", "NodeGrid"
 ]);
 
 // --- Layout ---
@@ -166,7 +166,10 @@ function renderDetail(d) {
                 ${data.methods.map(m => {
                     const name = typeof m === 'string' ? m : m.name;
                     const desc = typeof m === 'string' ? '' : (m.description || '');
-                    return `<li title="${escapeHtml(desc)}">${escapeHtml(name)}</li>`;
+                    const info = desc
+                        ? `<span class="method-info">i<span class="method-tooltip">${escapeHtml(desc)}</span></span>`
+                        : '';
+                    return `<li><span>${escapeHtml(name)}</span>${info}</li>`;
                 }).join('')}
             </ul>
         </div>`;

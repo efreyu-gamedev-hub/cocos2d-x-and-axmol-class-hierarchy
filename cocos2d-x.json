@@ -23766,38 +23766,6 @@
             ],
             "children": [
               {
-                "name": "HelloWorld",
-                "description": "",
-                "header": "tests/cpp-empty-test/Classes/HelloWorldScene.h",
-                "methods": [
-                  {
-                    "name": "create()",
-                    "description": ""
-                  },
-                  {
-                    "name": "createScene()",
-                    "description": ""
-                  },
-                  {
-                    "name": "init()",
-                    "description": ""
-                  },
-                  {
-                    "name": "menuCloseCallback(Ref *)",
-                    "description": ""
-                  },
-                  {
-                    "name": "menuCloseCallback(cocos2d::Ref *)",
-                    "description": ""
-                  },
-                  {
-                    "name": "scene()",
-                    "description": ""
-                  }
-                ],
-                "children": []
-              },
-              {
                 "name": "TransitionScene",
                 "description": "@class TransitionScene\n@brief Base class for Transition scenes.",
                 "header": "cocos/2d/CCTransition.h",
@@ -26659,18 +26627,6 @@
               {
                 "name": "setSkirtHeightRatio(float)",
                 "description": "set the skirt height ratio"
-              }
-            ],
-            "children": []
-          },
-          {
-            "name": "ValueTypeJudgeInTable",
-            "description": "@since v3.3rc1\n This class is used to check if the the value type judgement in table is correct or not.\n eg:\n If call `create` by passing {index1 = 111, index2 = 112, index3 = 113} from lua,\n the type 111,112,113 would be judged as string type before 3.3rc1",
-            "header": "tests/lua-tests/project/Classes/lua_test_bindings.cpp",
-            "methods": [
-              {
-                "name": "create(ValueMap)",
-                "description": ""
               }
             ],
             "children": []
