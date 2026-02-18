@@ -5142,78 +5142,6 @@
         "children": []
       },
       {
-        "name": "AudioEngineImpl",
-        "description": "",
-        "header": "cocos/audio/apple/AudioEngine-inl.h",
-        "methods": [
-          {
-            "name": "getCurrentTime(int)",
-            "description": ""
-          },
-          {
-            "name": "getDuration(int)",
-            "description": ""
-          },
-          {
-            "name": "init()",
-            "description": ""
-          },
-          {
-            "name": "pause(int)",
-            "description": ""
-          },
-          {
-            "name": "play2d(const std::string &, bool, float)",
-            "description": ""
-          },
-          {
-            "name": "preload(const std::string &, std::function<void (bool)>)",
-            "description": ""
-          },
-          {
-            "name": "resume(int)",
-            "description": ""
-          },
-          {
-            "name": "setCurrentTime(int, float)",
-            "description": ""
-          },
-          {
-            "name": "setFinishCallback(int, const std::function<void (int, const std::string &)> &)",
-            "description": ""
-          },
-          {
-            "name": "setLoop(int, bool)",
-            "description": ""
-          },
-          {
-            "name": "setVolume(int, float)",
-            "description": ""
-          },
-          {
-            "name": "stop(int)",
-            "description": ""
-          },
-          {
-            "name": "stopAll()",
-            "description": ""
-          },
-          {
-            "name": "uncache(const std::string &)",
-            "description": ""
-          },
-          {
-            "name": "uncacheAll()",
-            "description": ""
-          },
-          {
-            "name": "update(float)",
-            "description": ""
-          }
-        ],
-        "children": []
-      },
-      {
         "name": "BMFontConfiguration",
         "description": "@brief BMFontConfiguration has parsed configuration of the .fnt file\n@since v0.8",
         "header": "cocos/2d/CCFontFNT.h",
@@ -5630,34 +5558,6 @@
           }
         ],
         "children": [
-          {
-            "name": "BufferMTL",
-            "description": "@brief Used to store vertex and index data data.\nDynamic buffer data refers to frequently updated data stored in a buffer.\nTo avoid creating new buffers per frame and to minimize processor idle time between frames, implement a triple buffering model to update dynamic buffer.",
-            "header": "cocos/renderer/backend/metal/BufferMTL.h",
-            "methods": [
-              {
-                "name": "beginFrame()",
-                "description": "@brief a triple buffering\nWill switch to next buffer and use the buffer in the following render pass in current frame."
-              },
-              {
-                "name": "getMTLBuffer()",
-                "description": "@name Setters & Getters"
-              },
-              {
-                "name": "updateData(void *, std::size_t)",
-                "description": "@name Update Buffer\n    /**\n     * @brief Update buffer data\n     * @param data Specifies a pointer to data that will be copied into the data store for initialization.\n     * @param size Specifies the size in bytes of the data store region being replaced.\n     * @see `updateSubData(void* data, unsigned int offset, unsigned int size)`\n     */"
-              },
-              {
-                "name": "updateSubData(void *, std::size_t, std::size_t)",
-                "description": "@brief Update buffer sub-region data\n@param data Specifies a pointer to the new data that will be copied into the data store.\n@param offset Specifies the offset into the buffer object's data store where data replacement will begin, measured in bytes.\n@param size Specifies the size in bytes of the data store region being replaced.\n@see `updateData(void* data, unsigned int size)`"
-              },
-              {
-                "name": "usingDefaultStoredData(bool)",
-                "description": "Emply implementation. Mainly used in EGL context lost."
-              }
-            ],
-            "children": []
-          }
         ]
       },
       {
@@ -6060,82 +5960,6 @@
           }
         ],
         "children": [
-          {
-            "name": "CommandBufferMTL",
-            "description": "@brief Store encoded commands for the GPU to execute.\nA command buffer stores encoded commands until the buffer is committed for execution by the GPU",
-            "header": "cocos/renderer/backend/metal/CommandBufferMTL.h",
-            "methods": [
-              {
-                "name": "beginFrame()",
-                "description": "@name Setters & Getters\n    /**\n     * @brief Indicate the begining of a frame\n     * Wait until the inflight command buffer has completed its work.\n     * Then create MTLCommandBuffer and enqueue it to MTLCommandQueue.\n     * Then start schedule available MTLBuffer\n     */"
-              },
-              {
-                "name": "beginRenderPass(const RenderPassDescriptor &)",
-                "description": "Create a MTLRenderCommandEncoder object for graphics rendering to an attachment in a RenderPassDescriptor.\nMTLRenderCommandEncoder is cached if current RenderPassDescriptor is identical to previous one.\n@param descriptor Specifies a group of render targets that hold the results of a render pass."
-              },
-              {
-                "name": "captureScreen(std::function<void (const unsigned char *, int, int)>)",
-                "description": "Get a screen snapshot\n@param callback A callback to deal with screen snapshot image."
-              },
-              {
-                "name": "drawArrays(PrimitiveType, std::size_t, std::size_t)",
-                "description": "Draw primitives without an index list.\n@param primitiveType The type of primitives that elements are assembled into.\n@param start For each instance, the first index to draw\n@param count For each instance, the number of indexes to draw\n@see `drawElements(PrimitiveType primitiveType, IndexFormat indexType, unsigned int count, unsigned int offset)`"
-              },
-              {
-                "name": "drawElements(PrimitiveType, IndexFormat, std::size_t, std::size_t)",
-                "description": "Draw primitives with an index list.\n@param primitiveType The type of primitives that elements are assembled into.\n@param indexType The type if indexes, either 16 bit integer or 32 bit integer.\n@param count The number of indexes to read from the index buffer for each instance.\n@param offset Byte offset within indexBuffer to start reading indexes from.\n@see `setIndexBuffer(Buffer* buffer)`\n@see `drawArrays(PrimitiveType primitiveType, unsigned int start,  unsigned int count)`"
-              },
-              {
-                "name": "endFrame()",
-                "description": "Present a drawable and commit a command buffer so it can be executed as soon as possible."
-              },
-              {
-                "name": "endRenderPass()",
-                "description": "Do some resources release."
-              },
-              {
-                "name": "setCullMode(CullMode)",
-                "description": "Fixed-function state\n@param mode Controls if primitives are culled when front facing, back facing, or not culled at all."
-              },
-              {
-                "name": "setDepthStencilState(DepthStencilState *)",
-                "description": "Set depthStencil status\n@param depthStencilState Specifies the depth and stencil status"
-              },
-              {
-                "name": "setIndexBuffer(Buffer *)",
-                "description": "Set indexes when drawing primitives with index list\n@ buffer A buffer object that the device will read indexes from.\n@ see `drawElements(PrimitiveType primitiveType, IndexFormat indexType, unsigned int count, unsigned int offset)`"
-              },
-              {
-                "name": "setLineWidth(float)",
-                "description": "Fixed-function state\n@param lineWidth Specifies the width of rasterized lines.\n@todo Currently metal do not support setting line with. A Corresponding issue had create here:https://github.com/cocos2d/cocos2d-x/issues/19772"
-              },
-              {
-                "name": "setProgramState(ProgramState *)",
-                "description": "Set the uniform data at a given vertex and fragment buffer binding point 1\nSet a global texture for all vertex and fragment shaders at the given bind location.\n@param programState A programState object that hold the uniform and texture data."
-              },
-              {
-                "name": "setRenderPipeline(RenderPipeline *)",
-                "description": "Sets the current render pipeline state object.\n@param renderPipeline An object that contains the graphics functions and configuration state used in a render pass."
-              },
-              {
-                "name": "setScissorRect(bool, float, float, float, float)",
-                "description": "Fixed-function state\n@param x, y Specifies the lower left corner of the scissor box\n@param wdith Specifies the width of the scissor box\n@param height Specifies the height of the scissor box"
-              },
-              {
-                "name": "setVertexBuffer(Buffer *)",
-                "description": "Set a global buffer for all vertex shaders at the given bind point index 0.\n@param buffer The buffer to set in the buffer argument table."
-              },
-              {
-                "name": "setViewport(int, int, unsigned int, unsigned int)",
-                "description": "Fixed-function state\n@param x The x coordinate of the upper-left corner of the viewport.\n@param y The y coordinate of the upper-left corner of the viewport.\n@param w The width of the viewport, in pixels.\n@param h The height of the viewport, in pixels."
-              },
-              {
-                "name": "setWinding(Winding)",
-                "description": "Fixed-function state\n@param winding The winding order of front-facing primitives."
-              }
-            ],
-            "children": []
-          }
         ]
       },
       {
@@ -7881,18 +7705,6 @@
         "header": "cocos/renderer/backend/DepthStencilState.h",
         "methods": [],
         "children": [
-          {
-            "name": "DepthStencilStateMTL",
-            "description": "A class represent a depth/stencil test status.",
-            "header": "cocos/renderer/backend/metal/DepthStencilStateMTL.h",
-            "methods": [
-              {
-                "name": "getMTLDepthStencilState()",
-                "description": "@name Setters & Getters\n    /**\n     * get a MTLDepthStencilState object\n     */"
-              }
-            ],
-            "children": []
-          }
         ]
       },
       {
@@ -7962,70 +7774,6 @@
           }
         ],
         "children": [
-          {
-            "name": "DeviceMTL",
-            "description": "Create resources from MTLDevice.",
-            "header": "cocos/renderer/backend/metal/DeviceMTL.h",
-            "methods": [
-              {
-                "name": "createDepthStencilState(const DepthStencilDescriptor &)",
-                "description": "Create a DepthStencilState object.\n@param descriptor Specifies depth and stencil description.\n@return An auto release DepthStencilState object."
-              },
-              {
-                "name": "getCAMetalLayer()",
-                "description": "Get a CAMetalLayer.\n@return A CAMetalLayer object."
-              },
-              {
-                "name": "getCurrentDrawable()",
-                "description": "Get available Drawable.\n@return an available drawable."
-              },
-              {
-                "name": "getMTLCommandQueue()",
-                "description": "Get a MTLCommandQueue object.\n@return A MTLCommandQueue object."
-              },
-              {
-                "name": "getMTLDevice()",
-                "description": "Get a MTLDevice object.\n@return A MTLDevice object."
-              },
-              {
-                "name": "newBuffer(std::size_t, BufferType, BufferUsage)",
-                "description": "New a Buffer object.\n@param size Specifies the size in bytes of the buffer object's new data store.\n@param type Specifies the target buffer object. The symbolic constant must be BufferType::VERTEX or BufferType::INDEX.\n@param usage Specifies the expected usage pattern of the data store. The symbolic constant must be BufferUsage::STATIC, BufferUsage::DYNAMIC.\n@return A Buffer object."
-              },
-              {
-                "name": "newCommandBuffer()",
-                "description": "@name Setters & Getters\n    /**\n     * New a CommandBuffer object.\n     * @return A CommandBuffer object.\n     */"
-              },
-              {
-                "name": "newProgram(const std::string &, const std::string &)",
-                "description": "New a Program, not auto release.\n@param vertexShader Specifes this is a vertex shader source.\n@param fragmentShader Specifes this is a fragment shader source.\n@return A Program instance."
-              },
-              {
-                "name": "newRenderPipeline()",
-                "description": "New a RenderPipeline object.\n@param descriptor Specifies render pipeline description.\n@return A RenderPipeline object."
-              },
-              {
-                "name": "newTexture(const TextureDescriptor &)",
-                "description": "New a TextureBackend object.\n@param descriptor Specifies texture description.\n@return A TextureBackend object."
-              },
-              {
-                "name": "resetCurrentDrawable()",
-                "description": "Reset current drawable to nil."
-              },
-              {
-                "name": "setCAMetalLayer(CAMetalLayer *)",
-                "description": "Set CAMetalLayer.\n@param metalLayer A CAMetalLayer object."
-              },
-              {
-                "name": "setFrameBufferOnly(bool)",
-                "description": "This property controls whether or not the drawables'\nMTLTextures may only be used for framebuffer attachments (YES) or\nwhether they may also be used for texture sampling and pixel\nread/write operations (NO).\n@param frameBufferOnly A value of YES allows CAMetalLayer to allocate the MTLTexture objects in ways that are optimized for display purposes that makes them unsuitable for sampling. The recommended value for most applications is YES."
-              },
-              {
-                "name": "updateDrawable()",
-                "description": "Invoke by engine internally at the beginning of rendering a new frame."
-              }
-            ],
-            "children": []
-          }
         ]
       },
       {
@@ -32772,62 +32520,6 @@
           }
         ],
         "children": [
-          {
-            "name": "ProgramMTL",
-            "description": "A metal Program",
-            "header": "cocos/renderer/backend/metal/ProgramMTL.h",
-            "methods": [
-              {
-                "name": "getActiveAttributes()",
-                "description": "Get active vertex attributes.\n@return Active vertex attributes. key is active attribute name, Value is corresponding attribute info."
-              },
-              {
-                "name": "getActiveUniformInfo(ShaderStage, int)",
-                "description": "Get a uniformInfo in given location from the specific shader stage.\n@param stage Specifies the shader stage. The symbolic constant can be either VERTEX or FRAGMENT.\n@param location Specifies the uniform locaion.\n@return The uniformInfo."
-              },
-              {
-                "name": "getAllActiveUniformInfo(ShaderStage)",
-                "description": "Get all uniformInfos.\n@return The uniformInfos."
-              },
-              {
-                "name": "getAttributeLocation(Attribute)",
-                "description": "Get attribute location by engine built-in attribute enum name.\n@param name Specifies the engine built-in attribute enum name.\n@return The attribute location."
-              },
-              {
-                "name": "getAttributeLocation(const std::string &)",
-                "description": "Get attribute location by attribute name.\n@param name Specifies the attribute name.\n@return The attribute location."
-              },
-              {
-                "name": "getFragmentShader()",
-                "description": "Get fragment shader module.\n@ Fragment shader module."
-              },
-              {
-                "name": "getMaxFragmentLocation()",
-                "description": "Get maximum fragment location.\n@return Maximum fragment location."
-              },
-              {
-                "name": "getMaxVertexLocation()",
-                "description": "Get maximum vertex location.\n@return Maximum vertex locaiton."
-              },
-              {
-                "name": "getUniformBufferSize(ShaderStage)",
-                "description": "Get uniform buffer size in bytes that can hold all the uniforms.\n@param stage Specifies the shader stage. The symbolic constant can be either VERTEX or FRAGMENT.\n@return The uniform buffer size in bytes."
-              },
-              {
-                "name": "getUniformLocation(backend::Uniform)",
-                "description": "Get uniform location by engine built-in uniform enum name.\n@param name Specifies the engine built-in uniform enum name.\n@return The uniform location."
-              },
-              {
-                "name": "getUniformLocation(const std::string &)",
-                "description": "Get uniform location by name.\n@param uniform Specifies the uniform name.\n@return The uniform location."
-              },
-              {
-                "name": "getVertexShader()",
-                "description": "Get vertex shader module.\n@return Vertex shader module."
-              }
-            ],
-            "children": []
-          }
         ]
       },
       {
@@ -32989,22 +32681,6 @@
           }
         ],
         "children": [
-          {
-            "name": "RenderPipelineMTL",
-            "description": "Create and compile a new MTLRenderPipelineState object synchronously.",
-            "header": "cocos/renderer/backend/metal/RenderPipelineMTL.h",
-            "methods": [
-              {
-                "name": "getMTLRenderPipelineState()",
-                "description": "Get a MTLRenderPipelineState object.\n@return A MTLRenderPipelineState object."
-              },
-              {
-                "name": "update(const PipelineDescriptor &, const RenderPassDescriptor &)",
-                "description": ""
-              }
-            ],
-            "children": []
-          }
         ]
       },
       {
@@ -33416,54 +33092,6 @@
           }
         ],
         "children": [
-          {
-            "name": "ShaderModuleMTL",
-            "description": "To Create a vertex or fragment shader.",
-            "header": "cocos/renderer/backend/metal/ShaderModuleMTL.h",
-            "methods": [
-              {
-                "name": "getActiveUniform(int)",
-                "description": "Get current shader uniform informatino.\n@return Uniform information. Key is each uniform name, Value is corresponding uniform info."
-              },
-              {
-                "name": "getAllActiveUniformInfo()",
-                "description": "Get all uniformInfos.\n@return The uniformInfos."
-              },
-              {
-                "name": "getAttributeInfo()",
-                "description": "Get active attribute informations.\n@return Active attribute informations. key is attribute name and Value is corresponding attribute info."
-              },
-              {
-                "name": "getAttributeLocation(Attribute)",
-                "description": "Get attribute location by engine built-in attribute enum name.\n@param name Specifies the engine built-in attribute enum name.\n@return The attribute location."
-              },
-              {
-                "name": "getAttributeLocation(std::string)",
-                "description": "Get attribute location by attribute name.\n@param name Specifies the attribute name.\n@return The attribute location."
-              },
-              {
-                "name": "getMTLFunction()",
-                "description": "Get MTLFunction object.\n@return A MTLFunction object."
-              },
-              {
-                "name": "getMaxLocation()",
-                "description": "Get maximum uniform location.\n@return Maximum uniform location."
-              },
-              {
-                "name": "getUniformBufferSize()",
-                "description": "Get uniform buffer size in bytes that holds all the uniforms.\n@return The uniform buffer size."
-              },
-              {
-                "name": "getUniformLocation(Uniform)",
-                "description": "Get uniform location by engine built-in uniform enum name.\n@param name Specifies the engine built-in uniform enum name.\n@return The uniform location."
-              },
-              {
-                "name": "getUniformLocation(const std::string &)",
-                "description": "Get uniform location by name.\n@param uniform Specifies the uniform name.\n@return The uniform location."
-              }
-            ],
-            "children": []
-          }
         ]
       },
       {
@@ -34604,54 +34232,6 @@
               }
             ],
             "children": [
-              {
-                "name": "TextureMTL",
-                "description": "A 2D texture",
-                "header": "cocos/renderer/backend/metal/TextureMTL.h",
-                "methods": [
-                  {
-                    "name": "generateMipmaps()",
-                    "description": "Generate mipmaps."
-                  },
-                  {
-                    "name": "getBytes(std::size_t, std::size_t, std::size_t, std::size_t, bool, std::function<void (const unsigned char *, std::size_t, std::size_t)>)",
-                    "description": "Read a block of pixels from the drawable texture\n@param x,y Specify the window coordinates of the first pixel that is read from the drawable texture. This location is the lower left corner of a rectangular block of pixels.\n@param width,height Specify the dimensions of the pixel rectangle. width and height of one correspond to a single pixel.\n@param flipImage Specifies if needs to flip the image.\n@param callback Specifies a call back function to deal with the image."
-                  },
-                  {
-                    "name": "getMTLSamplerState()",
-                    "description": "Get MTLSamplerState object\n@return A MTLSamplerState object."
-                  },
-                  {
-                    "name": "getMTLTexture()",
-                    "description": "Get MTLTexture object.\n@return A MTLTexture object."
-                  },
-                  {
-                    "name": "updateCompressedData(uint8_t *, std::size_t, std::size_t, std::size_t, std::size_t)",
-                    "description": "Update a two-dimensional texture image in a compressed format\n@param data Specifies a pointer to the compressed image data in memory.\n@param width Specifies the width of the texture image.\n@param height Specifies the height of the texture image.\n@param dataLen Specifies the totoal size of compressed image in bytes.\n@param level Specifies the level-of-detail number. Level 0 is the base image level. Level n is the nth mipmap reduction image."
-                  },
-                  {
-                    "name": "updateCompressedSubData(std::size_t, std::size_t, std::size_t, std::size_t, std::size_t, std::size_t, uint8_t *)",
-                    "description": "Update a two-dimensional texture subimage in a compressed format\n@param xoffset Specifies a texel offset in the x direction within the texture array.\n@param yoffset Specifies a texel offset in the y direction within the texture array.\n@param width Specifies the width of the texture subimage.\n@param height Specifies the height of the texture subimage.\n@param dataLen Specifies the totoal size of compressed subimage in bytes.\n@param level Specifies the level-of-detail number. Level 0 is the base image level. Level n is the nth mipmap reduction image.\n@param data Specifies a pointer to the compressed image data in memory."
-                  },
-                  {
-                    "name": "updateData(uint8_t *, std::size_t, std::size_t, std::size_t)",
-                    "description": "Update a two-dimensional texture image\n@param data Specifies a pointer to the image data in memory.\n@param width Specifies the width of the texture image.\n@param height Specifies the height of the texture image.\n@param level Specifies the level-of-detail number. Level 0 is the base image level. Level n is the nth mipmap reduction image."
-                  },
-                  {
-                    "name": "updateSamplerDescriptor(const SamplerDescriptor &)",
-                    "description": "Update sampler\n@param sampler Specifies the sampler descriptor."
-                  },
-                  {
-                    "name": "updateSubData(std::size_t, std::size_t, std::size_t, std::size_t, std::size_t, uint8_t *)",
-                    "description": "Update a two-dimensional texture subimage\n@param xoffset Specifies a texel offset in the x direction within the texture array.\n@param yoffset Specifies a texel offset in the y direction within the texture array.\n@param width Specifies the width of the texture subimage.\n@param height Specifies the height of the texture subimage.\n@param level Specifies the level-of-detail number. Level 0 is the base image level. Level n is the nth mipmap reduction image.\n@param data Specifies a pointer to the image data in memory."
-                  },
-                  {
-                    "name": "updateTextureDescriptor(const cocos2d::backend::TextureDescriptor &)",
-                    "description": "Update texture description.\n@param descriptor Specifies texture and sampler descriptor."
-                  }
-                ],
-                "children": []
-              }
             ]
           },
           {
@@ -34665,42 +34245,6 @@
               }
             ],
             "children": [
-              {
-                "name": "TextureCubeMTL",
-                "description": "A texture cube",
-                "header": "cocos/renderer/backend/metal/TextureMTL.h",
-                "methods": [
-                  {
-                    "name": "generateMipmaps()",
-                    "description": "Generate mipmaps."
-                  },
-                  {
-                    "name": "getBytes(std::size_t, std::size_t, std::size_t, std::size_t, bool, std::function<void (const unsigned char *, std::size_t, std::size_t)>)",
-                    "description": "Read a block of pixels from the drawable texture\n@param x,y Specify the window coordinates of the first pixel that is read from the drawable texture. This location is the lower left corner of a rectangular block of pixels.\n@param width,height Specify the dimensions of the pixel rectangle. width and height of one correspond to a single pixel.\n@param flipImage Specifies if needs to flip the image.\n@param callback"
-                  },
-                  {
-                    "name": "getMTLSamplerState()",
-                    "description": "Get MTLSamplerState object\n@return A MTLSamplerState object."
-                  },
-                  {
-                    "name": "getMTLTexture()",
-                    "description": "Get MTLTexture object.\n@return A MTLTexture object."
-                  },
-                  {
-                    "name": "updateFaceData(TextureCubeFace, void *)",
-                    "description": "Update texutre cube data in give slice side.\n@param side Specifies which slice texture of cube to be update.\n@param data Specifies a pointer to the image data in memory."
-                  },
-                  {
-                    "name": "updateSamplerDescriptor(const SamplerDescriptor &)",
-                    "description": "Update sampler\n@param sampler Specifies the sampler descriptor."
-                  },
-                  {
-                    "name": "updateTextureDescriptor(const cocos2d::backend::TextureDescriptor &)",
-                    "description": "Update texture description.\n@param descriptor Specifies texture and sampler descriptor."
-                  }
-                ],
-                "children": []
-              }
             ]
           }
         ]

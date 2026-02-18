@@ -6006,78 +6006,6 @@
           }
         ],
         "children": [
-          {
-            "name": "BufferImpl",
-            "description": "@brief Used to store vertex and index data data.\nDynamic buffer data refers to frequently updated data stored in a buffer.\nTo avoid creating new buffers per frame and to minimize processor idle time between frames, implement a triple\nbuffering model to update dynamic buffer.",
-            "header": "axmol/rhi/metal/BufferMTL.h",
-            "methods": [
-              {
-                "name": "beginFrame()",
-                "description": "@brief a triple buffering\nWill switch to next buffer and use the buffer in the following render pass in current frame."
-              },
-              {
-                "name": "getMTLBuffer()",
-                "description": "@name Setters & Getters"
-              },
-              {
-                "name": "updateData(const void *, std::size_t)",
-                "description": "@name Update Buffer\n    /**\n     * @brief Update buffer data\n     * @param data Specifies a pointer to data that will be copied into the data store for initialization.\n     * @param size Specifies the size in bytes of the data store region being replaced.\n     * @see `updateSubData(void* data, unsigned int offset, unsigned int size)`\n     */"
-              },
-              {
-                "name": "updateSubData(const void *, std::size_t, std::size_t)",
-                "description": "@brief Update buffer sub-region data\n@param data Specifies a pointer to the new data that will be copied into the data store.\n@param offset Specifies the offset into the buffer object's data store where data replacement will begin,\nmeasured in bytes.\n@param size Specifies the size in bytes of the data store region being replaced.\n@see `updateData(void* data, unsigned int size)`"
-              },
-              {
-                "name": "usingDefaultStoredData(bool)",
-                "description": "Emply implementation. Mainly used in EGL context lost."
-              }
-            ],
-            "children": []
-          },
-          {
-            "name": "BufferMetal",
-            "description": "",
-            "header": "extensions/Effekseer/3rdParty/LLGI/src/Metal/LLGI.BufferMetal.h",
-            "methods": [
-              {
-                "name": "GetBuffer()",
-                "description": ""
-              },
-              {
-                "name": "GetBufferSize()",
-                "description": ""
-              },
-              {
-                "name": "GetOffset()",
-                "description": ""
-              },
-              {
-                "name": "GetSize()",
-                "description": ""
-              },
-              {
-                "name": "Initialize(Graphics *, BufferUsageType, int32_t)",
-                "description": ""
-              },
-              {
-                "name": "InitializeAsShortTime(BufferMetal *, int32_t, int32_t)",
-                "description": ""
-              },
-              {
-                "name": "Lock()",
-                "description": ""
-              },
-              {
-                "name": "Lock(int32_t, int32_t)",
-                "description": ""
-              },
-              {
-                "name": "Unlock()",
-                "description": ""
-              }
-            ],
-            "children": []
-          }
         ]
       },
       {
@@ -7610,22 +7538,7 @@
           }
         ],
         "children": [
-          {
-            "name": "DepthStencilStateImpl",
-            "description": "A class represent a depth/stencil test status.",
-            "header": "axmol/rhi/metal/DepthStencilStateMTL.h",
-            "methods": [
-              {
-                "name": "getMTLDepthStencilState()",
-                "description": "@name Setters & Getters\n    /**\n     * get a MTLDepthStencilState object\n     */"
-              },
-              {
-                "name": "update(const DepthStencilDesc &)",
-                "description": ""
-              }
-            ],
-            "children": []
-          }
+
         ]
       },
       {
@@ -31451,13 +31364,6 @@
           }
         ],
         "children": [
-          {
-            "name": "ProgramImpl",
-            "description": "A metal Program",
-            "header": "axmol/rhi/metal/ProgramMTL.h",
-            "methods": [],
-            "children": []
-          }
         ]
       },
       {
@@ -31699,118 +31605,6 @@
           }
         ],
         "children": [
-          {
-            "name": "RenderContextImpl",
-            "description": "@brief Store encoded commands for the GPU to execute.\nA command buffer stores encoded commands until the buffer is committed for execution by the GPU",
-            "header": "axmol/rhi/metal/RenderContextMTL.h",
-            "methods": [
-              {
-                "name": "acquireDrawable()",
-                "description": ""
-              },
-              {
-                "name": "beginFrame()",
-                "description": "@name Setters & Getters\n    /**\n     * @brief Indicate the begining of a frame\n     * Wait until the inflight command buffer has completed its work.\n     * Then create MTLCommandBuffer and enqueue it to MTLCommandQueue.\n     * Then start schedule available MTLBuffer\n     */"
-              },
-              {
-                "name": "beginRenderPass(RenderTarget *, const RenderPassDesc &)",
-                "description": "Create a MTLRenderCommandEncoder object for graphics rendering to an attachment in a RenderPassDesc.\nMTLRenderCommandEncoder is cached if current RenderPassDesc is identical to previous one.\n@param descriptor Specifies a group of render targets that hold the results of a render pass."
-              },
-              {
-                "name": "drawArrays(std::size_t, std::size_t, bool)",
-                "description": "Draw primitives without an index list.\n@param start For each instance, the first index to draw\n@param count For each instance, the number of indexes to draw\n@see `drawElements(IndexFormat indexType, unsigned int count, unsigned int offset)`"
-              },
-              {
-                "name": "drawArraysInstanced(std::size_t, std::size_t, int, bool)",
-                "description": ""
-              },
-              {
-                "name": "drawElements(IndexFormat, std::size_t, std::size_t, bool)",
-                "description": "Draw primitives with an index list.\n@param indexType The type if indexes, either 16 bit integer or 32 bit integer.\n@param count The number of indexes to read from the index buffer for each instance.\n@param offset Byte offset within indexBuffer to start reading indexes from.\n@see `setIndexBuffer(Buffer* buffer)`\n@see `drawArrays(PrimitiveType primitiveType, unsigned int start,  unsigned int count)`"
-              },
-              {
-                "name": "drawElementsInstanced(IndexFormat, std::size_t, std::size_t, int, bool)",
-                "description": ""
-              },
-              {
-                "name": "endEncoding()",
-                "description": ""
-              },
-              {
-                "name": "endFrame()",
-                "description": "Present a drawable and commit a command buffer so it can be executed as soon as possible."
-              },
-              {
-                "name": "endRenderPass()",
-                "description": "Do some resources release."
-              },
-              {
-                "name": "getMetalLayer()",
-                "description": ""
-              },
-              {
-                "name": "getRenderCommandEncoder()",
-                "description": ""
-              },
-              {
-                "name": "getScreenRenderTarget()",
-                "description": ""
-              },
-              {
-                "name": "readPixels(RenderTarget *, bool, std::function<void (const PixelBufferDesc &)>)",
-                "description": ""
-              },
-              {
-                "name": "setCullMode(CullMode)",
-                "description": "Fixed-function state\n@param mode Controls if primitives are culled when front facing, back facing, or not culled at all."
-              },
-              {
-                "name": "setDepthStencilState(DepthStencilState *)",
-                "description": "Set depthStencil status\n@param depthStencilState Specifies the depth and stencil status"
-              },
-              {
-                "name": "setIndexBuffer(Buffer *)",
-                "description": "Set indexes when drawing primitives with index list\n@ buffer A buffer object that the device will read indexes from.\n@ see `drawElements(IndexFormat indexType, unsigned int count, unsigned int offset)`"
-              },
-              {
-                "name": "setInstanceBuffer(Buffer *)",
-                "description": ""
-              },
-              {
-                "name": "setRenderPipeline(RenderPipeline *)",
-                "description": "Sets the current render pipeline state object once\n@param renderPipeline An object that contains the graphics functions and configuration state used in a render\npass."
-              },
-              {
-                "name": "setScissorRect(bool, float, float, float, float)",
-                "description": "Fixed-function state\n@param x, y Specifies the lower left corner of the scissor box\n@param wdith Specifies the width of the scissor box\n@param height Specifies the height of the scissor box"
-              },
-              {
-                "name": "setVertexBuffer(Buffer *)",
-                "description": "Set a global buffer for all vertex shaders at the given bind point index 0.\n@param buffer The buffer to set in the buffer argument table."
-              },
-              {
-                "name": "setViewport(int, int, unsigned int, unsigned int)",
-                "description": "Fixed-function state\n@param x The x coordinate of the upper-left corner of the viewport.\n@param y The y coordinate of the upper-left corner of the viewport.\n@param w The width of the viewport, in pixels.\n@param h The height of the viewport, in pixels."
-              },
-              {
-                "name": "setWinding(Winding)",
-                "description": "Fixed-function state\n@param winding The winding order of front-facing primitives."
-              },
-              {
-                "name": "updateDepthStencilState(const DepthStencilDesc &)",
-                "description": "Update depthStencil status, improvment: for metal backend cache it\n@param depthStencilState Specifies the depth and stencil status"
-              },
-              {
-                "name": "updatePipelineState(const RenderTarget *, const PipelineDesc &, PrimitiveType)",
-                "description": "Update render pipeline status\nBuilding a programmable pipeline involves an expensive evaluation of GPU state.\nSo a new render pipeline object will be created only if it hasn't been created before.\n@param rt Specifies the render target.\n@param desc Specifies the pipeline descriptor."
-              },
-              {
-                "name": "updateSurface(SurfaceHandle, uint32_t, uint32_t)",
-                "description": ""
-              }
-            ],
-            "children": []
-          }
         ]
       },
       {
@@ -31819,22 +31613,6 @@
         "header": "axmol/rhi/RenderPipeline.h",
         "methods": [],
         "children": [
-          {
-            "name": "RenderPipelineImpl",
-            "description": "Create and compile a new MTLRenderPipelineState object synchronously.",
-            "header": "axmol/rhi/metal/RenderPipelineMTL.h",
-            "methods": [
-              {
-                "name": "getMTLRenderPipelineState()",
-                "description": "Get a MTLRenderPipelineState object.\n@return A MTLRenderPipelineState object."
-              },
-              {
-                "name": "update(const RenderTarget *, const PipelineDesc &)",
-                "description": ""
-              }
-            ],
-            "children": []
-          }
         ]
       },
       {
@@ -31888,50 +31666,6 @@
           }
         ],
         "children": [
-          {
-            "name": "RenderTargetImpl",
-            "description": "@addtogroup _metal\n@{",
-            "header": "axmol/rhi/metal/RenderTargetMTL.h",
-            "methods": [
-              {
-                "name": "applyRenderPassAttachments(const RenderPassDesc &, MTLRenderPassDescriptor *)",
-                "description": ""
-              },
-              {
-                "name": "getColorAttachment(int)",
-                "description": ""
-              },
-              {
-                "name": "getColorAttachmentPixelFormat(int)",
-                "description": ""
-              },
-              {
-                "name": "getDepthStencilAttachment()",
-                "description": ""
-              },
-              {
-                "name": "getDepthStencilAttachmentPixelFormat()",
-                "description": ""
-              },
-              {
-                "name": "getHash()",
-                "description": ""
-              },
-              {
-                "name": "getNativeColorFormats()",
-                "description": ""
-              },
-              {
-                "name": "getNativeDSFormat()",
-                "description": ""
-              },
-              {
-                "name": "rebuildSwapchainAttachments()",
-                "description": ""
-              }
-            ],
-            "children": []
-          }
         ]
       },
       {
@@ -32596,18 +32330,6 @@
           }
         ],
         "children": [
-          {
-            "name": "ShaderModuleImpl",
-            "description": "To Create a vertex or fragment shader.",
-            "header": "axmol/rhi/metal/ShaderModuleMTL.h",
-            "methods": [
-              {
-                "name": "getMTLFunction()",
-                "description": "Get MTLFunction object.\n@return A MTLFunction object."
-              }
-            ],
-            "children": []
-          }
         ]
       },
       {
